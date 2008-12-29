@@ -24,7 +24,7 @@ class TestCatalogFieldIndex(unittest.TestCase):
 
     def test_sort_lazy_nolimit(self):
         index = self._makeOne()
-        index.use_lazy = True
+        index.force_lazy = True
         self._populateIndex(index)
         from BTrees.IFBTree import IFSet
         c1 = IFSet([1, 2, 3, 4, 5])
@@ -33,12 +33,30 @@ class TestCatalogFieldIndex(unittest.TestCase):
 
     def test_sort_lazy_withlimit(self):
         index = self._makeOne()
-        index.use_lazy = True
+        index.force_lazy = True
         self._populateIndex(index)
         from BTrees.IFBTree import IFSet
         c1 = IFSet([1, 2, 3, 4, 5])
         result = index.sort(c1, limit=3)
         self.assertEqual(list(result), [5, 2, 1])
+
+    def test_sort_lazy_reverse_nolimit(self):
+        index = self._makeOne()
+        index.force_lazy = True
+        self._populateIndex(index)
+        from BTrees.IFBTree import IFSet
+        c1 = IFSet([1, 2, 3, 4, 5])
+        result = index.sort(c1, reverse=True)
+        self.assertEqual(list(result), [4, 3, 1, 2, 5])
+
+    def test_sort_lazy_reverse_withlimit(self):
+        index = self._makeOne()
+        index.force_lazy = True
+        self._populateIndex(index)
+        from BTrees.IFBTree import IFSet
+        c1 = IFSet([1, 2, 3, 4, 5])
+        result = index.sort(c1, limit=3, reverse=True)
+        self.assertEqual(list(result), [4, 3, 1])
 
     def test_sort_nonlazy_nolimit(self):
         index = self._makeOne()
@@ -82,7 +100,7 @@ class TestCatalogFieldIndex(unittest.TestCase):
 
     def test_sort_nbest(self):
         index = self._makeOne()
-        index.use_nbest = True
+        index.force_nbest = True
         self._populateIndex(index)
         from BTrees.IFBTree import IFSet
         c1 = IFSet([1, 2, 3, 4, 5])
@@ -91,7 +109,7 @@ class TestCatalogFieldIndex(unittest.TestCase):
 
     def test_sort_nbest_reverse(self):
         index = self._makeOne()
-        index.use_nbest = True
+        index.force_nbest = True
         self._populateIndex(index)
         from BTrees.IFBTree import IFSet
         c1 = IFSet([1, 2, 3, 4, 5])
@@ -100,7 +118,7 @@ class TestCatalogFieldIndex(unittest.TestCase):
 
     def test_sort_nbest_missing(self):
         index = self._makeOne()
-        index.use_nbest = True
+        index.force_nbest = True
         self._populateIndex(index)
         from BTrees.IFBTree import IFSet
         c1 = IFSet([1, 2, 3, 4, 5, 99])
@@ -109,7 +127,7 @@ class TestCatalogFieldIndex(unittest.TestCase):
 
     def test_sort_nbest_missing_reverse(self):
         index = self._makeOne()
-        index.use_nbest = True
+        index.force_nbest = True
         self._populateIndex(index)
         from BTrees.IFBTree import IFSet
         c1 = IFSet([1, 2, 3, 4, 5, 99])
