@@ -49,8 +49,9 @@ class CatalogKeywordIndex(CatalogIndex, KeywordIndex):
         sets = []
         for word in query:
             docids = self._fwd_index.get(word)
-            if docids:
-                sets.append(docids)
+            if operator == 'and' and not docids:
+                return []
+            sets.append(docids)
 
         if operator == 'or':
             rs = self.family.IF.multiunion(sets)
