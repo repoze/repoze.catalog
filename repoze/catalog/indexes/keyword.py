@@ -48,8 +48,9 @@ class CatalogKeywordIndex(CatalogIndex, KeywordIndex):
 
         sets = []
         for word in query:
-            docids = self._fwd_index.get(word, self.family.IF.Set())
-            sets.append(docids)
+            docids = self._fwd_index.get(word)
+            if docids:
+                sets.append(docids)
 
         if operator == 'or':
             rs = self.family.IF.multiunion(sets)
@@ -58,7 +59,7 @@ class CatalogKeywordIndex(CatalogIndex, KeywordIndex):
             rs = None
             # sort smallest to largest set so we intersect the smallest
             # number of document identifiers possible
-            sets.sort(lambda x, y: cmp(len(x), len(y)))
+            sets.sort(key=len)
             for set in sets:
                 rs = self.family.IF.intersection(rs, set)
                 if not rs:
