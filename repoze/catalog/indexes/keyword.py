@@ -47,9 +47,10 @@ class CatalogKeywordIndex(CatalogIndex, KeywordIndex):
             query = [query]
 
         sets = []
+        is_and = operator == 'and'
         for word in query:
             docids = self._fwd_index.get(word)
-            if operator == 'and' and not docids:
+            if is_and and not docids:
                 return []
             sets.append(docids)
 
