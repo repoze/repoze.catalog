@@ -13,8 +13,8 @@ _marker = []
 
 class CatalogFieldIndex(CatalogIndex, FieldIndex):
     implements(ICatalogIndex)
-    scan_slope = 243.08
-    scan_icept = 3.336
+    scan_slope = 247.95
+    scan_icept = .596
     nbest_percent = .09
     force_scan = False
     force_nbest = False
@@ -60,7 +60,7 @@ class CatalogFieldIndex(CatalogIndex, FieldIndex):
             # by y=mx+b where m=scan_slope and b=scan_intercept, using
             # (float(rlen)/numdocs) as "x", solving for the maximum
             # limit as y.  The default line slope and intercept was
-            # computed using these two points: point1 = (.274, 70),
+            # computed using these two points: point1 = (.01372, 4),
             # point2 = (.562, 140), based on emprical testing using an
             # index that had about 67000 total documentids in it
             # against a ZEO server with a zodb cache size=300000 and
