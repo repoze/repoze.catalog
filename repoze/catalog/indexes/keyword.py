@@ -49,13 +49,12 @@ class CatalogKeywordIndex(CatalogIndex, KeywordIndex):
         sets = []
         is_and = operator == 'and'
 
-        for word in query:
-            docids = self._fwd_index.get(word)
-            if is_and and not docids:
-                return []
-            sets.append(docids)
-
-        if is_and:
+        if operator == 'and':
+            for word in query:
+                docids = self._fwd_index.get(word)
+                if not docids:
+                    return []
+                sets.append(docids)
             rs = None
             # sort smallest to largest set so we intersect the smallest
             # number of document identifiers possible
@@ -65,6 +64,10 @@ class CatalogKeywordIndex(CatalogIndex, KeywordIndex):
                 if not rs:
                     break
         else:
+            for word in query:
+                docids = self._fwd_index.get(word)
+                if docids:
+                    sets.append(docids)
             rs = self.family.IF.multiunion(sets)
 
         if rs:
