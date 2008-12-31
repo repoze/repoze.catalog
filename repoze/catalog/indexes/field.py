@@ -13,10 +13,12 @@ _marker = []
 
 class CatalogFieldIndex(CatalogIndex, FieldIndex):
     implements(ICatalogIndex)
-    force_lazy = None # for unit testing
-    force_nbest = None # for unit testing
-
-    nbest_max_percent = .25 # "about a quarter of the size of the entire rs"
+    scan_slope = 243.08
+    scan_icept = 3.336
+    nbest_percent = .09
+    force_scan = False
+    force_nbest = False
+    force_brute = False
 
     def sort(self, docids, reverse=False, limit=None):
         if limit is not None:
@@ -25,130 +27,144 @@ class CatalogFieldIndex(CatalogIndex, FieldIndex):
                 raise ValueError('limit must be 1 or greater')
 
         if not docids:
-            raise StopIteration
+            return []
             
         numdocs = self._num_docs.value
         if not numdocs:
-            raise StopIteration
+            return []
+
+        if reverse:
+            return self.sort_reverse(docids, limit, numdocs)
+        else:
+            return self.sort_forward(docids, limit, numdocs)
+
+    def sort_forward(self, docids, limit, numdocs):
 
         rev_index = self._rev_index
         fwd_index = self._fwd_index
 
         rlen = len(docids)
 
-        # use_lazy computation lifted wholesale from Zope2 catalog
-        # without questioning algorithm.  We use "lazy" sorting when
-        # the size of the result set is much larger than the number of
-        # documents in this index.
-        use_lazy = (rlen > (numdocs * (rlen / 100 + 1)))
+        # for unit testing
+        if self.force_scan:
+            return self.scan_forward(docids, limit)
+        elif self.force_nbest:
+            return self.nbest_ascending(docids, limit)
+        elif self.force_brute:
+            return self.bruteforce_ascending(docids, limit)
 
-        # use n-best when the limit argument limits to fewer than
-        # self.nbest_max_percent % of the total number of results (see
-        # http://www.zope.org/Members/Caseman/ZCatalog_for_2.6.1 for
-        # overall explanation of n-best)
-        use_nbest = ( (limit and (limit/float(rlen) < self.nbest_max_percent)) )
+        if limit:
+            # Forward scan "wins" when the supplied limit is below a
+            # point on a linear scale.  If limit < scanlimit, it means
+            # that the limit is below the line on a graph represented
+            # by y=mx+b where m=scan_slope and b=scan_intercept, using
+            # (float(rlen)/numdocs) as "x", solving for the maximum
+            # limit as y.  The default line slope and intercept was
+            # computed using these two points: point1 = (.274, 70),
+            # point2 = (.562, 140), based on emprical testing using an
+            # index that had about 67000 total documentids in it
+            # against a ZEO server with a zodb cache size=300000 and
+            # zeo cache size of 1GB on Mac OS X.  Forward-scan has a
+            # very limited set of uses; its only used when the limit
+            # is very small and the ratio of numdocs/rlen is very
+            # high; it's also probably very punitive when the ZODB
+            # cache size is too small for the application being used,
+            # as disk activity will dwarf any presumed savings.
+            scanlimit = self.scan_slope*(float(rlen)/numdocs) + self.scan_icept
+            if limit < scanlimit:
+                return self.scan_forward(docids, limit)
+            elif limit / float(rlen) > self.nbest_percent:
+                # the nbest_percent constant compared against limit /
+                # float(rlen) above is an educated guess (see
+                # http://www.zope.org/Members/Caseman/ZCatalog_for_2.6.1
+                # for overall explanation of n-best)
+                return self.nbest_ascending(docids, limit)
 
-        if self.force_nbest is not None:
-            use_nbest = self.force_nbest
-        if self.force_lazy is not None:
-            use_lazy = self.force_lazy
+        return self.bruteforce_ascending(docids, limit)
 
-        marker = _marker
+    def sort_reverse(self, docids, limit, numdocs):
 
-        if use_nbest:
-            # this is a sort with a limit that appears useful, and the
-            # limit argument limits to fewer than
-            # self.nbest_max_percent % of the total number of results,
-            # try to take advantage of the fact that we can keep a
-            # smaller set of simultaneous values in memory; use
-            # generators and heapq functions to do so.
-            if reverse:
-                # we use a generator as an iterable in the reverse
-                # sort case because the nlargest implementation does
-                # not manifest the whole thing into memory at once if
-                # we do so.
-                iterable = nsort(docids, rev_index)
-                for val in heapq.nlargest(limit, iterable):
-                    yield val[1]
+        # for unit testing
+        if self.force_nbest:
+            return self.nbest_descending(docids, limit)
+        elif self.force_brute:
+            return self.bruteforce_descending(docids, limit)
 
-            else:
-                # lifted from heapq.nsmallest
-                if limit * 10 <=  rlen:
-                    iterable = nsort(docids, rev_index)
-                    it = iter(iterable)
-                    result = sorted(islice(it, 0, limit))
-                    if not result:
-                        yield StopIteration
-                    insort = bisect.insort
-                    pop = result.pop
-                    los = result[-1]    # los --> Largest of the nsmallest
-                    for elem in it:
-                        if los <= elem:
-                            continue
-                        insort(result, elem)
-                        pop()
-                        los = result[-1]
-                else:
-                    h = []
-                    for docid in docids:
-                        val = rev_index.get(docid, marker)
-                        if val is not marker:
-                            h.append((val, docid))
-                    heapq.heapify(h)
-                    result = map(heapq.heappop,
-                                 heapq.repeat(h, min(limit, len(h))))
+        rlen = len(docids)
+            
+        if limit and ( (limit/float(rlen)) > self.nbest_percent):
+            # the nbest_percent constant compared against limit /
+            # float(rlen) above is an educated guess (see
+            # http://www.zope.org/Members/Caseman/ZCatalog_for_2.6.1
+            # for overall explanation of n-best)
+            return self.nbest_descending(docids, limit)
 
-                for val in result:
-                    yield val[1]
+        return self.bruteforce_descending(docids, limit)
 
-        elif use_lazy:
-            # If the number of results in the search result set is
-            # much larger than the number of items in this index, we
-            # assume it will be fastest to iterate over the keys or
-            # values one of our indexes.
+    def scan_forward(self, docids, limit=None):
+        fwd_index = self._fwd_index
 
-            if reverse:
-                # Our reverse index is a mapping from a docid to its
-                # value.  Calling byValue on our reverse index returns
-                # a *fully materialized* list (not a generator) of
-                # (value, docid) tuples in reverse-value order.  The
-                # None passed to byValue is a *minimum value* (this
-                # seems like a broken API).
-                n = 0
-                for value, docid in rev_index.byValue(None):
-                    if docid in docids:
-                        if limit and n >= limit:
-                            raise StopIteration
-                        n += 1
-                        yield docid
-
-            else:
-                # Our forward index is a mapping from value to set of
-                # docids.  If we're sorting in ascending order, pick
-                # off docids from our forward BTree's values, as its
-                # keys are already sorted in ascending sort-value
-                # order.
-                n = 0
-                for stored_docids in fwd_index.values():
-                    isect = self.family.IF.intersection(docids, stored_docids)
-                    for docid in isect:
-                        if limit and n >= limit:
-                            raise StopIteration
-                        n += 1
-                        yield docid
-        else:
-            # If the result set isn't much larger than the number of
-            # documents in this index and we can't use n-best, use a
-            # non-lazy sort.
-            n = 0
-            for docid in sorted(docids, key=rev_index.get, reverse=reverse):
-                if rev_index.get(docid, marker) is not marker:
-                    # we skip docids that are not in this index (as
-                    # per Z2 catalog implementation)
+        sets = []
+        n = 0
+        isect = self.family.IF.intersection
+        for set in fwd_index.values():
+            if set:
+                set = isect(docids, set)
+            if set:
+                for docid in set:
+                    n+=1
+                    yield docid
                     if limit and n >= limit:
                         raise StopIteration
-                    n += 1
-                    yield docid
+
+    def nbest_ascending(self, docids, limit):
+        if limit is None:
+            raise RuntimeError, 'n-best used without limit'
+
+        h = nsort(docids, self._rev_index)
+        it = iter(h)
+        result = sorted(islice(it, 0, limit))
+        if not result:
+            raise StopIteration
+        insort = bisect.insort
+        pop = result.pop
+        los = result[-1]    # los --> Largest of the nsmallest
+        for elem in it:
+            if los <= elem:
+                continue
+            insort(result, elem)
+            pop()
+            los = result[-1]
+
+        for value, docid in result:
+            yield docid
+
+    def nbest_descending(self, docids, limit):
+        if limit is None:
+            raise RuntimeError, 'N-Best used without limit'
+        rev_index = self._rev_index
+        iterable = nsort(docids, rev_index)
+        for value, docid in heapq.nlargest(limit, iterable):
+            yield docid
+    
+    def bruteforce_ascending(self, docids, limit):
+        return self._bruteforce(docids, limit, reverse=False)
+
+    def bruteforce_descending(self, docids, limit):
+        return self._bruteforce(docids, limit, reverse=True)
+
+    def _bruteforce(self, docids, limit, reverse):
+        rev_index = self._rev_index
+        marker = _marker
+        n = 0
+        for docid in sorted(docids, key=rev_index.get, reverse=reverse):
+            if rev_index.get(docid, marker) is not marker:
+                # we skip docids that are not in this index (as
+                # per Z2 catalog implementation)
+                n += 1
+                yield docid
+                if limit and n >= limit:
+                    raise StopIteration
 
     def unindex_doc(self, docid):
         """See interface IInjection.
