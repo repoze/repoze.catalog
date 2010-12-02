@@ -4,6 +4,10 @@ Next release (0.8)
 - Deprecated ``.search``-based querying of catalog in favor of newer
   query language(s) via ``.query``.  See docs for more info.
 
+- Provided a mechanism for indexes to provide query result sets lazily,
+  making it possible (in theory) to query multiple external indexes
+  with a single external call. 
+
 0.7.3 (2010-08-26)
 ==================
 

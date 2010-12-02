@@ -27,9 +27,9 @@ class TestCatalog(unittest.TestCase):
         verifyObject(ICatalog, inst)
 
     def test_ctor_defaults(self):
-        from BTrees import family32
+        from repoze.catalog.family import adaptable_family32
         catalog = self._makeOne()
-        self.failUnless(catalog.family is family32)
+        self.failUnless(catalog.family is adaptable_family32)
 
     def test_ctor_explicit_family(self):
         from BTrees import family64

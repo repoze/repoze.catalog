@@ -1,4 +1,4 @@
-import BTrees
+
 from persistent.mapping import PersistentMapping
 import transaction
 
@@ -6,12 +6,16 @@ from zope.interface import implements
 
 from repoze.catalog.interfaces import ICatalog
 from repoze.catalog.interfaces import ICatalogIndex
+from repoze.catalog.interfaces import IEstimateLength
+from repoze.catalog.interfaces import ISortable
+from repoze.catalog.family import adaptable_family32
+
 
 class Catalog(PersistentMapping):
 
     implements(ICatalog)
 
-    family = BTrees.family32
+    family = adaptable_family32
 
     def __init__(self, family=None):
         PersistentMapping.__init__(self)
@@ -93,7 +97,10 @@ class Catalog(PersistentMapping):
                     # empty results, bail early; intersect will be null
                     return 0, r
 
-                results.append((len(r), r))
+                if IEstimateLength.providedBy(r):
+                    results.append((r.estimate_length(), r))
+                else:
+                    results.append((len(r), r))
 
             if not results:
                 return 0, ()
@@ -127,17 +134,24 @@ class Catalog(PersistentMapping):
     def sort_result(self, result, sort_index=None, limit=None, sort_type=None,
                     reverse=False):
 
-        numdocs = len(result)
-
         if sort_index:
             index = self[sort_index]
+
+            if ISortable.providedBy(result):
+                # The result knows how to sort.
+                r = result.sort(index, limit=limit, sort_type=sort_type,
+                    reverse=reverse)
+                if r is not None:
+                    return len(r), r
+
+            numdocs = len(result)
             result = index.sort(result, reverse=reverse, limit=limit,
                                 sort_type=sort_type)
             if limit:
                 numdocs = min(numdocs, limit)
             return numdocs, result
         else:
-            return numdocs, result
+            return len(result), result
 
     def query(self, queryobject, sort_index=None, limit=None, sort_type=None,
               reverse=False, names=None):

@@ -1,5 +1,6 @@
-import BTrees
+
 import sys
+from repoze.catalog.family import adaptable_family32
 
 try:
     import ast
@@ -221,7 +222,7 @@ class SetOp(Query):
     """
     Base class for set operators.
     """
-    family = BTrees.family32
+    family = adaptable_family32
 
     def __init__(self, left, right):
         self.left = left
@@ -266,9 +267,9 @@ class Union(SetOp):
     def apply(self, catalog):
         left = self.left.apply(catalog)
         right = self.right.apply(catalog)
-        if len(left) == 0:
+        if not left:
             results = right
-        elif len(right) == 0:
+        elif not right:
             results = left
         else:
             _, results = self.family.IF.weightedUnion(left, right)
@@ -279,12 +280,12 @@ class Intersection(SetOp):
     """Intersection of two result sets."""
     def apply(self, catalog):
         left = self.left.apply(catalog)
-        if len(left) == 0:
-            results = self.family.IF.Set()
+        if not left:
+            results = left
         else:
             right = self.right.apply(catalog)
-            if len(right) == 0:
-                results = self.family.IF.Set()
+            if not right:
+                results = right
             else:
                 _, results = self.family.IF.weightedIntersection(left, right)
         return results
@@ -294,11 +295,11 @@ class Difference(SetOp):
     """Difference between two result sets."""
     def apply(self, catalog):
         left = self.left.apply(catalog)
-        if len(left) == 0:
-            results = self.family.IF.Set()
+        if not left:
+            results = left
         else:
             right = self.right.apply(catalog)
-            if len(right) == 0:
+            if not right:
                 results = left
             else:
                 results = self.family.IF.difference(left, right)
@@ -679,7 +680,7 @@ def _group_any_and_all(tree):
 
     # Must call group on the root node, in case the root node needs to be
     # replaced.
-    op, index, values = visit(tree)
+    _op, index, values = visit(tree)
     return group(tree, index, values)
 
 

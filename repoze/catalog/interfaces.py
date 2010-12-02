@@ -64,3 +64,48 @@ class ISearchQuery(Interface):
         processed in a chain, results added after this query get added again. 
         So probably you need to call this at the end of the chain.
         """
+
+
+class IMergeAdapter(Interface):
+    """Allows merge operations between different collection types.
+
+    For example, this could allow a lazy result set to provide
+    intersection, union, and difference operations with a BTree result set.
+
+    Implemented by some docid collections.
+    """
+    def get_module(c1, c2):
+        """Get a merge operations module compatible with both collections.
+
+        Returns the NotImplemented object (similar to __cmp__) if
+        this collection does not know of a good way to merge with the other.
+        """
+
+
+class IEstimateLength(Interface):
+    """Provides a method to estimate the length of this collection.
+
+    Implemented by some docid collections.  Useful for avoiding a call
+    to an external service when an exact length is not needed.
+    """
+    def estimate_length():
+        """Return the estimated length of this collection.
+
+        May return 0 even if the collection contains something.
+        """
+
+
+class ISortable(Interface):
+    """Provides a method to sort this object into a list of docids.
+
+    Implemented by some docid collections.  Useful for asking an
+    external service to do the sorting for us.
+    """
+    def sort(index, limit=None, sort_type=None, reverse=False):
+        """Return the sorted docid sequence.
+
+        index is an ICatalogIndex.
+        limit is either an integer or None.
+        sort_type has a meaning defined by the application.
+        reverse is boolean.
+        """
