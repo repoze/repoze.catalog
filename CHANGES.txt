@@ -1,3 +1,15 @@
+Next release
+============
+
+- Add ``repoze.catalog.indexes.intfield.CatalogIntFieldIndex`` index type.
+  This is an index that operates just like a FieldIndex but is optimized
+  for integer values.
+
+- Add a ``__ne__`` to the _Range comparator to make ``!=`` comparisons work
+  properly.
+
+- Add a suitable tox.ini.
+
 0.8.1 (2011-08-17)
 ==================
 
