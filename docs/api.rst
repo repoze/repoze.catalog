@@ -83,6 +83,18 @@ Other Helpers
    .. autoclass:: CatalogFieldIndex
       :members:
 
+.. _api_intfieldindex_section:
+
+:mod:`repoze.catalog.indexes.intfield`
+--------------------------------------
+
+.. automodule:: repoze.catalog.indexes.intfield
+
+   .. autoclass:: CatalogIntFieldIndex
+      :members:
+
+   .. autofunction:: convert_field_to_intfield
+
 .. _api_keywordindex_section:
 
 :mod:`repoze.catalog.indexes.keyword`

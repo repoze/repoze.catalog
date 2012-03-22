@@ -119,9 +119,10 @@ Index Types
 Out of the box, ``repoze.catalog`` supports five index types: field indexes,
 keyword indexes, text indexes, facet indexes, and path indexes. Field indexes
 are meant to index single discrete values. Keys are stored in order, allowing
-for the full suite of range and comparison operators to be used. Keyword
-indexes index sequences of values which can be queried for any of the values
-in each sequence indexed. Text indexes index text using the
+for the full suite of range and comparison operators to be used. IntField
+indexes are like FieldIndexes but are optimized for storing only integers.
+Keyword indexes index sequences of values which can be queried for any of the
+values in each sequence indexed. Text indexes index text using the
 ``zope.index.text`` index type, and can be queried with arbitrary textual
 terms. Text indexes can use various splitting and normalizing strategies to
 collapse indexed texts for better querying. Facet indexes are much like

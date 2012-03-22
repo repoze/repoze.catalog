@@ -107,9 +107,11 @@ This item is the document id for the content we indexed.  Your
 application is responsible for resolving this document identifier back
 to its constituent content.
 
-.. warning:: The result set is only guaranteed to be an iterable.  It
-   will always be of a particular type, and *not* always sliceable;
-   for example it may be a generator.
+.. warning::
+
+   The result set is only guaranteed to be an iterable.  It will always be of
+   a particular type, and *not* always sliceable; for example it may be a
+   generator.
 
 You can also combine query objects, using boolean operations, to search
 multiple indexes:
@@ -199,7 +201,9 @@ The above string is a CQE.  A "CQE" is a string representing a Python
 expression which uses index names and values.  It is parsed by the
 catalog to create a query object.
 
-.. warning:: CQE strings are not supported on Python versions < 2.6.
+.. warning::
+
+   CQE strings are not supported on Python versions < 2.6.
 
 Whether a query object is used directly or query objects are generated
 as the result of a CQE, an individual query object will be one of two
@@ -228,9 +232,11 @@ as follows:
 
     query = Eq('author', 'crossi') & Contains('body', 'biscuits')
 
-.. note:: Although it would be more intuitive to use the boolean operators,
-   ``or`` and ``and`` for this rather than bitwise operators, Python does not
-   allow overloading boolean operators.
+.. note::
+
+   Although it would be more intuitive to use the boolean operators, ``or``
+   and ``and`` for this rather than bitwise operators, Python does not allow
+   overloading boolean operators.
 
 Query objects may also be created by parsing a :term:`CQE` string.
 The query parser uses Python's internal code parser to parse CQE query
@@ -498,9 +504,11 @@ CQE::
 Search Using the :meth:`repoze.catalog.Catalog.search` Method (Deprecated)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. warning:: The :meth:`repoze.catalog.Catalog.search` method is
-   deprecated as of :mod:`repoze.catalog` 0.8.  Use
-   :meth:`repoze.catalog.Catalog.query` instead.
+.. warning::
+
+   The :meth:`repoze.catalog.Catalog.search` method is deprecated as of
+   :mod:`repoze.catalog` 0.8.  Use :meth:`repoze.catalog.Catalog.query`
+   instead.
 
 We can pass a query into our catalog's ``search`` method, which is
 composed of the name of our index and a value we'd like to find a
