@@ -344,6 +344,9 @@ class _Range(Comparator):
                 self.start_exclusive == other.start_exclusive and
                 self.end_exclusive == other.end_exclusive)
 
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
 
 class InRange(_Range):
     """ Index value falls within a range.
