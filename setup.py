@@ -15,7 +15,6 @@
 __version__ = '0.8.1'
 
 import os
-import sys
 
 from setuptools import setup, find_packages
 
