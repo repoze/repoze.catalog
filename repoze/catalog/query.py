@@ -69,7 +69,7 @@ class Comparator(Query):
             return tuple(self._get_value(names, child) for child in value)
         elif isinstance(value, Name):
             name = value.name
-            if name not in names:
+            if not names or name not in names:
                 raise NameError("No value passed in for name: %s" % name)
             return names[name]
         return value
