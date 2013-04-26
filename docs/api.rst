@@ -22,10 +22,10 @@
 :mod:`repoze.catalog.query`
 ---------------------------
 
-.. module:: repoze.catalog.query
-
 Comparators
 ~~~~~~~~~~~
+
+.. automodule:: repoze.catalog.query
 
    .. autoclass:: Contains
 
@@ -60,6 +60,8 @@ Comparators
 Boolean Operators
 ~~~~~~~~~~~~~~~~~
 
+.. automodule:: repoze.catalog.query
+
    .. autoclass:: Or
 
    .. autoclass:: And
@@ -69,9 +71,11 @@ Boolean Operators
 Other Helpers
 ~~~~~~~~~~~~~
 
-.. autoclass:: Name
+.. automodule:: repoze.catalog.query
 
-.. autofunction:: parse_query
+   .. autoclass:: Name
+
+   .. autofunction:: parse_query
 
 .. _api_fieldindex_section:
 
