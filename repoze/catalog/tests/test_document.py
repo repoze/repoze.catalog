@@ -46,16 +46,6 @@ class TestDocumentMap(unittest.TestCase):
         self.assertEqual(map.docid_to_address.get(3), 'yup')
         self.assertEqual(map.address_to_docid['yup'], 3)
 
-    def test_add_address_None(self):
-        map = self._makeOne()
-        map.add(None, 1)
-        map.add(None, 2)
-        self.assertEqual(len(map.docid_to_address), 1)
-        self.assertEqual(len(map.address_to_docid), 1)
-        self.failIf(1 in map.docid_to_address)
-        self.assertEqual(map.docid_to_address.get(2), None)
-        self.assertEqual(map.address_to_docid[None], 2)
-
     def test_add_existing_docid_new_address_replaces_old(self):
         map = self._makeOne()
         old_docid = map.add('/address1')
