@@ -25,10 +25,14 @@ try:
 except IOError:
     README = CHANGES = ''
 
-install_requires = ['setuptools', 'zope.component', 'zope.index >= 3.5.0']
+INSTALL_REQUIRES = [
+    'setuptools',
+    'zope.component',
+    'zope.index >= 3.5.0',
+]
 
-testing_extras = ['nose', 'coverage']
-docs_extras = ['Sphinx']
+TESTING_EXTRAS = ['nose', 'coverage']
+DOCS_EXTRAS = ['Sphinx']
 
 setup(name='repoze.catalog',
       version=__version__,
@@ -37,6 +41,7 @@ setup(name='repoze.catalog',
       classifiers=[
         "Intended Audience :: Developers",
         "Programming Language :: Python",
+        "Programming Language :: Python :: 2",
         "Programming Language :: Python :: 2.6",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: Implementation :: CPython",
@@ -51,12 +56,12 @@ setup(name='repoze.catalog',
       include_package_data=True,
       namespace_packages=['repoze'],
       zip_safe=False,
-      tests_require = install_requires,
-      install_requires = install_requires,
+      tests_require = INSTALL_REQUIRES,
+      install_requires = INSTALL_REQUIRES,
       extras_require = {
-        'benchmark': ['PyChart'],
-        'testing': testing_extras,
-        'docs':docs_extras,
+            'benchmark': ['PyChart'],
+            'testing': TESTING_EXTRAS,
+            'docs': DOCS_EXTRAS,
         },
       test_suite="repoze.catalog",
       ## entry_points = """\
@@ -64,5 +69,4 @@ setup(name='repoze.catalog',
       ## catalog_benchmark = repoze.catalog.benchmark.benchmark:run
       ## sortbench = repoze.catalog.benchmark.sortbench:main
       ## """,
-      )
-
+)
