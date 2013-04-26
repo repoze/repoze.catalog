@@ -28,6 +28,10 @@ except IOError:
 INSTALL_REQUIRES = [
     'setuptools',
     'zope.component',
+    'ZODB',
+    'BTrees',
+    'persistent',
+    'transaction',
     'zope.index >= 3.5.0',
 ]
 
