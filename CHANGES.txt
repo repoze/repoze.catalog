@@ -1,4 +1,4 @@
-0.8.3 (unreleased)
+0.8.3 (2014-08-07)
 ==================
 
 - Fix bug in query with names are None [ebrehault].
