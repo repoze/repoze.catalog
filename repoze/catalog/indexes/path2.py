@@ -372,8 +372,7 @@ class CatalogPathIndex2(CatalogIndex):  #pragma NO COVERAGE
         return self.apply(query)
 
 def add_to_closest(sofar, thispath, theset):
-    paths = sofar.keys()
-    paths.reverse()
+    paths = sorted(sofar.keys(), reverse=True)
     for path in paths:
         pathlen = len(path)
         if thispath[:pathlen] == path:
@@ -381,8 +380,7 @@ def add_to_closest(sofar, thispath, theset):
             break
 
 def remove_from_closest(sofar, thispath, docid):
-    paths = sofar.keys()
-    paths.reverse()
+    paths = sorted(sofar.keys(), reverse=True)
     for path in paths:
         pathlen = len(path)
         if thispath[:pathlen] == path:
