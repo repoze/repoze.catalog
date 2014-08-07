@@ -4,6 +4,7 @@ env26/
 *.pyc
 *$py.class
 .coverage
+.*.swp
 dist/
 *~
 .tox
