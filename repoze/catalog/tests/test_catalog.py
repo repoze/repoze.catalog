@@ -12,13 +12,13 @@ class TestCatalog(unittest.TestCase):
         if family is _marker:
             return klass()
         return klass(family)
-    
+
     def test_klass_provides_ICatalog(self):
         klass = self._getTargetClass()
         from zope.interface.verify import verifyClass
         from repoze.catalog.catalog import ICatalog
         verifyClass(ICatalog, klass)
-        
+
     def test_inst_provides_ICatalog(self):
         klass = self._getTargetClass()
         from zope.interface.verify import verifyObject
@@ -87,6 +87,7 @@ class TestCatalog(unittest.TestCase):
         catalog['name2'] = idx2
         numdocs, result = catalog.search(name1={}, name2={})
         self.assertEqual(numdocs, 1)
+        self.assertEqual(numdocs.total, 1)
         self.assertEqual(list(result), [3])
 
     def test_search_index_returns_empty(self):
@@ -100,6 +101,7 @@ class TestCatalog(unittest.TestCase):
         catalog['name2'] = idx2
         numdocs, result = catalog.search(name1={}, name2={})
         self.assertEqual(numdocs, 0)
+        self.assertEqual(numdocs.total, 0)
         self.assertEqual(list(result), [])
 
     def test_search_no_intersection(self):
@@ -113,6 +115,7 @@ class TestCatalog(unittest.TestCase):
         catalog['name2'] = idx2
         numdocs, result = catalog.search(name1={}, name2={})
         self.assertEqual(numdocs, 0)
+        self.assertEqual(numdocs.total, 0)
         self.assertEqual(list(result), [])
 
     def test_search_index_query_order_returns_empty(self):
@@ -127,12 +130,14 @@ class TestCatalog(unittest.TestCase):
         numdocs, result = catalog.search(name1={}, name2={},
                                          index_query_order=['name2', 'name1'])
         self.assertEqual(numdocs, 0)
+        self.assertEqual(numdocs.total, 0)
         self.assertEqual(list(result), [])
 
     def test_search_no_indexes_in_search(self):
         catalog = self._makeOne()
         numdocs, result = catalog.search()
         self.assertEqual(numdocs, 0)
+        self.assertEqual(numdocs.total, 0)
         self.assertEqual(list(result), [])
 
     def test_search_noindex(self):
@@ -155,6 +160,7 @@ class TestCatalog(unittest.TestCase):
         catalog['name2'] = idx2
         numdocs, result = catalog.apply({'name1':{}, 'name2':{}})
         self.assertEqual(numdocs, 1)
+        self.assertEqual(numdocs.total, 1)
         self.assertEqual(list(result), [3])
 
     def test_search_with_sortindex_ascending(self):
@@ -169,6 +175,7 @@ class TestCatalog(unittest.TestCase):
         numdocs, result = catalog.search(
             name1={}, name2={}, sort_index='name1')
         self.assertEqual(numdocs, 3)
+        self.assertEqual(numdocs.total, 3)
         self.assertEqual(list(result), ['sorted1', 'sorted2', 'sorted3'])
 
     def test_search_with_sortindex_reverse(self):
@@ -184,6 +191,7 @@ class TestCatalog(unittest.TestCase):
             name1={}, name2={}, sort_index='name1',
             reverse=True)
         self.assertEqual(numdocs, 3)
+        self.assertEqual(numdocs.total, 3)
         self.assertEqual(list(result), ['sorted3', 'sorted2', 'sorted1'])
 
     def test_search_with_sort_type(self):
@@ -205,6 +213,7 @@ class TestCatalog(unittest.TestCase):
         catalog['name1'] = idx1
         numdocs, result = catalog.search(name1={}, sort_index='name1', limit=1)
         self.assertEqual(numdocs, 1)
+        self.assertEqual(numdocs.total, 5)
         self.assertEqual(idx1.limit, 1)
 
     def _test_functional_merge(self, **extra):
@@ -322,7 +331,7 @@ class TestConnectionManager(unittest.TestCase):
         manager = self._makeOne()
         manager(conn)
         self.assertEqual(manager.conn, conn)
-        
+
     def test_close(self):
         conn = DummyConnection()
         manager = self._makeOne()
@@ -344,6 +353,28 @@ class TestConnectionManager(unittest.TestCase):
         manager(conn)
         manager.commit(txn)
         self.assertEqual(txn.committed, True)
+
+class TestResultSetSize(unittest.TestCase):
+    def _makeOne(self, i, total):
+        from repoze.catalog.catalog import ResultSetSize
+        return ResultSetSize(i, total)
+
+    def test_ctor(self):
+        size = self._makeOne(1, 2)
+        self.assertEqual(size, 1)
+        self.assertEqual(size.total, 2)
+
+    def test_repr(self):
+        size = self._makeOne(1, 2)
+        self.assertEqual(repr(size), 'ResultSetSize(1, 2)')
+
+    def test_pickles(self):
+        import pickle
+        size = self._makeOne(1, 2)
+        unpickled = pickle.loads(pickle.dumps(size))
+        self.assertEqual(unpickled, 1)
+        self.assertEqual(unpickled.total, 2)
+        self.assertEqual(repr(unpickled), 'ResultSetSize(1, 2)')
 
 class DummyConnection:
     def close(self):

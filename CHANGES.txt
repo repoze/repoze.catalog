@@ -3,6 +3,10 @@
 
 - Fix bug in query with names are None [ebrehault].
 
+- The 'numdocs' return value from 'Catalog.search' is now a subclass of integer
+  with an added attribute, 'total', which gives the caller access to the total
+  size of the result set before being limited by the 'limit' argument.
+
 0.8.2 (2012-04-15)
 ==================
 

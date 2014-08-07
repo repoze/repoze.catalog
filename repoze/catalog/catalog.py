@@ -93,12 +93,12 @@ class Catalog(PersistentMapping):
                 r = index.apply(index_query)
                 if not r:
                     # empty results, bail early; intersect will be null
-                    return 0, r
+                    return EMPTY_RESULT
 
                 results.append((len(r), r))
 
             if not results:
-                return 0, ()
+                return EMPTY_RESULT
 
             results.sort() # order from smallest to largest
             _, result = results.pop(0)
@@ -106,7 +106,7 @@ class Catalog(PersistentMapping):
                 _, result = self.family.IF.weightedIntersection(result, r)
 
             if not result:
-                return 0, ()
+                EMPTY_RESULT
 
         else:
             # ordered query (use apply_intersect)
@@ -122,14 +122,14 @@ class Catalog(PersistentMapping):
                 result = index.apply_intersect(index_query, result)
                 if not result:
                     # empty results
-                    return 0, result
+                    return EMPTY_RESULT
 
         return self.sort_result(result, sort_index, limit, sort_type, reverse)
 
     def sort_result(self, result, sort_index=None, limit=None, sort_type=None,
                     reverse=False):
 
-        numdocs = len(result)
+        numdocs = total = len(result)
 
         if sort_index:
             index = self[sort_index]
@@ -137,9 +137,7 @@ class Catalog(PersistentMapping):
                                 sort_type=sort_type)
             if limit:
                 numdocs = min(numdocs, limit)
-            return numdocs, result
-        else:
-            return numdocs, result
+        return ResultSetSize(numdocs, total), result
 
     def query(self, queryobject, sort_index=None, limit=None, sort_type=None,
               reverse=False, names=None):
@@ -208,3 +206,14 @@ class ConnectionManager(object):
     def commit(self, transaction=transaction):
         transaction.commit()
 
+class ResultSetSizeClass(int):
+
+    def __repr__(self):
+        return 'ResultSetSize(%d, %d)' % (self, self.total)
+
+def ResultSetSize(i, total):
+    size = ResultSetSizeClass(i)
+    size.total = total
+    return size
+
+EMPTY_RESULT = ResultSetSize(0, 0), ()
