@@ -445,18 +445,18 @@ class CatalogPathIndex2Tests(unittest.TestCase):
         attr_checker = DummyAttrChecker()
         result = index.search('/', attr_checker=attr_checker)
         self.assertEqual(sorted(result), range(1, 21))
-        results = attr_checker.results
+        results = sorted(attr_checker.results)
         self.assertEqual(len(results), 4)
-        attrs, theset = results[0]
+        attrs, theset = results[3]
         self.assertEqual(attrs, (12, ['acl1', 'acl4']))
         self.assertEqual(sorted(theset), [12])
-        attrs, theset = results[1]
+        attrs, theset = results[0]
         self.assertEqual(attrs, (0, ['acl1']))
         self.assertEqual(list(theset), [1,3,4,5,6,7,11,13,14,15,16,17,18])
         attrs, theset = results[2]
         self.assertEqual(attrs, (8, ['acl1', 'acl2']))
         self.assertEqual(sorted(theset), [8, 19, 20])
-        attrs, theset = results[3]
+        attrs, theset = results[1]
         self.assertEqual(attrs, (2, ['acl1', 'acl3']))
         self.assertEqual(sorted(theset), [2,9, 10])
 
@@ -465,18 +465,18 @@ class CatalogPathIndex2Tests(unittest.TestCase):
         attr_checker = DummyAttrChecker()
         result = index.search('/', include_path=True, attr_checker=attr_checker)
         self.assertEqual(sorted(result), range(0, 21))
-        results = attr_checker.results
+        results = sorted(attr_checker.results)
         self.assertEqual(len(results), 4)
-        attrs, theset = results[0]
+        attrs, theset = results[3]
         self.assertEqual(attrs, (12, ['acl1', 'acl4']))
         self.assertEqual(sorted(theset), [12])
-        attrs, theset = results[1]
+        attrs, theset = results[0]
         self.assertEqual(attrs, (0, ['acl1']))
         self.assertEqual(list(theset), [0,1,3,4,5,6,7,11,13,14,15,16,17,18])
         attrs, theset = results[2]
         self.assertEqual(attrs, (8, ['acl1', 'acl2']))
         self.assertEqual(sorted(theset), [8, 19, 20])
-        attrs, theset = results[3]
+        attrs, theset = results[1]
         self.assertEqual(attrs, (2, ['acl1', 'acl3']))
         self.assertEqual(sorted(theset), [2,9, 10])
 
@@ -485,7 +485,7 @@ class CatalogPathIndex2Tests(unittest.TestCase):
         attr_checker = DummyAttrChecker()
         result = index.search('/', depth=0, attr_checker=attr_checker)
         self.assertEqual(sorted(result), [])
-        results = attr_checker.results
+        results = sorted(attr_checker.results)
         self.assertEqual(len(results), 1)
         attrs, theset = results[0]
         self.assertEqual(attrs, (0, ['acl1']))
@@ -497,7 +497,7 @@ class CatalogPathIndex2Tests(unittest.TestCase):
         result = index.search('/', depth=0, include_path=True,
                               attr_checker=attr_checker)
         self.assertEqual(sorted(result), [0])
-        results = attr_checker.results
+        results = sorted(attr_checker.results)
         self.assertEqual(len(results), 1)
         attrs, theset = results[0]
         self.assertEqual(attrs, (0, ['acl1']))
@@ -508,7 +508,7 @@ class CatalogPathIndex2Tests(unittest.TestCase):
         attr_checker = DummyAttrChecker()
         result = index.search('/', depth=1, attr_checker=attr_checker)
         self.assertEqual(sorted(result), [1, 5])
-        results = attr_checker.results
+        results = sorted(attr_checker.results)
         self.assertEqual(len(results), 1)
         attrs, theset = results[0]
         self.assertEqual(attrs, (0, ['acl1']))
@@ -520,7 +520,7 @@ class CatalogPathIndex2Tests(unittest.TestCase):
         result = index.search('/', depth=1, include_path=True,
                               attr_checker=attr_checker)
         self.assertEqual(sorted(result), [0, 1, 5])
-        results = attr_checker.results
+        results = sorted(attr_checker.results)
         self.assertEqual(len(results), 1)
         attrs, theset = results[0]
         self.assertEqual(attrs, (0, ['acl1']))
@@ -531,15 +531,15 @@ class CatalogPathIndex2Tests(unittest.TestCase):
         attr_checker = DummyAttrChecker()
         result = index.search('/', depth=2, attr_checker=attr_checker)
         self.assertEqual(sorted(result), [1, 2, 3, 4, 5, 6, 7, 8])
-        results = attr_checker.results
+        results = sorted(attr_checker.results)
         self.assertEqual(len(results), 3)
         attrs, theset = results[0]
         self.assertEqual(attrs, (0, ['acl1']))
         self.assertEqual(list(theset), [1,3,4,5,6,7])
-        attrs, theset = results[1]
+        attrs, theset = results[2]
         self.assertEqual(attrs, (8, ['acl1', 'acl2']))
         self.assertEqual(list(theset), [8])
-        attrs, theset = results[2]
+        attrs, theset = results[1]
         self.assertEqual(attrs, (2, ['acl1', 'acl3']))
         self.assertEqual(list(theset), [2])
 
@@ -549,15 +549,15 @@ class CatalogPathIndex2Tests(unittest.TestCase):
         result = index.search('/', depth=2, include_path=True,
                               attr_checker=attr_checker)
         self.assertEqual(sorted(result), [0, 1, 2, 3, 4, 5, 6, 7, 8])
-        results = attr_checker.results
+        results = sorted(attr_checker.results)
         self.assertEqual(len(results), 3)
         attrs, theset = results[0]
         self.assertEqual(attrs, (0, ['acl1']))
         self.assertEqual(list(theset), [0,1,3,4,5,6,7])
-        attrs, theset = results[1]
+        attrs, theset = results[2]
         self.assertEqual(attrs, (8, ['acl1', 'acl2']))
         self.assertEqual(list(theset), [8])
-        attrs, theset = results[2]
+        attrs, theset = results[1]
         self.assertEqual(attrs, (2, ['acl1', 'acl3']))
         self.assertEqual(list(theset), [2])
 
@@ -567,18 +567,18 @@ class CatalogPathIndex2Tests(unittest.TestCase):
         attr_checker = DummyAttrChecker()
         result = index.search('/', depth=3, attr_checker=attr_checker)
         self.assertEqual(sorted(result), range(1, 21))
-        results = attr_checker.results
+        results = sorted(attr_checker.results)
         self.assertEqual(len(results), 4)
-        attrs, theset = results[0]
+        attrs, theset = results[3]
         self.assertEqual(attrs, (12, ['acl1', 'acl4']))
         self.assertEqual(list(theset), [12])
-        attrs, theset = results[1]
+        attrs, theset = results[0]
         self.assertEqual(attrs, (0, ['acl1']))
         self.assertEqual(list(theset), [1,3,4,5,6,7,11,13,14,15,16,17,18])
         attrs, theset = results[2]
         self.assertEqual(attrs, (8, ['acl1', 'acl2']))
         self.assertEqual(list(theset), [8, 19, 20])
-        attrs, theset = results[3]
+        attrs, theset = results[1]
         self.assertEqual(attrs, (2, ['acl1', 'acl3']))
         self.assertEqual(list(theset), [2, 9, 10])
 
@@ -588,18 +588,18 @@ class CatalogPathIndex2Tests(unittest.TestCase):
         result = index.search('/', depth=3, include_path=True,
                               attr_checker=attr_checker)
         self.assertEqual(sorted(result), range(0, 21))
-        results = attr_checker.results
+        results = sorted(attr_checker.results)
         self.assertEqual(len(results), 4)
-        attrs, theset = results[0]
+        attrs, theset = results[3]
         self.assertEqual(attrs, (12, ['acl1', 'acl4']))
         self.assertEqual(list(theset), [12])
-        attrs, theset = results[1]
+        attrs, theset = results[0]
         self.assertEqual(attrs, (0, ['acl1']))
         self.assertEqual(list(theset), [0,1,3,4,5,6,7,11,13,14,15,16,17,18])
         attrs, theset = results[2]
         self.assertEqual(attrs, (8, ['acl1', 'acl2']))
         self.assertEqual(list(theset), [8, 19, 20])
-        attrs, theset = results[3]
+        attrs, theset = results[1]
         self.assertEqual(attrs, (2, ['acl1', 'acl3']))
         self.assertEqual(list(theset), [2, 9, 10])
 
@@ -608,7 +608,7 @@ class CatalogPathIndex2Tests(unittest.TestCase):
         attr_checker = DummyAttrChecker()
         result = index.search('/bb', attr_checker=attr_checker)
         self.assertEqual(sorted(result), [6, 7, 8, 15, 16, 17, 18, 19, 20])
-        results = attr_checker.results
+        results = sorted(attr_checker.results)
         self.assertEqual(len(results), 2)
         attrs, theset = results[0]
         self.assertEqual(attrs, (0, ['acl1']))
@@ -623,7 +623,7 @@ class CatalogPathIndex2Tests(unittest.TestCase):
         result = index.search('/bb', include_path=True,
                               attr_checker=attr_checker)
         self.assertEqual(sorted(result), [5, 6, 7, 8, 15, 16, 17, 18, 19, 20])
-        results = attr_checker.results
+        results = sorted(attr_checker.results)
         self.assertEqual(len(results), 2)
         attrs, theset = results[0]
         self.assertEqual(attrs, (0, ['acl1']))
@@ -637,7 +637,7 @@ class CatalogPathIndex2Tests(unittest.TestCase):
         attr_checker = DummyAttrChecker()
         result = index.search('/bb', depth=0, attr_checker=attr_checker)
         self.assertEqual(sorted(result), [])
-        results = attr_checker.results
+        results = sorted(attr_checker.results)
         self.assertEqual(len(results), 1)
         attrs, theset = results[0]
         self.assertEqual(attrs, (0, ['acl1']))
@@ -648,7 +648,7 @@ class CatalogPathIndex2Tests(unittest.TestCase):
         attr_checker = DummyAttrChecker()
         result = index.search('/bb', depth=1, attr_checker=attr_checker)
         self.assertEqual(sorted(result), [6,7,8])
-        results = attr_checker.results
+        results = sorted(attr_checker.results)
         self.assertEqual(len(results), 2)
         attrs, theset = results[0]
         self.assertEqual(attrs, (0, ['acl1']))
@@ -662,7 +662,7 @@ class CatalogPathIndex2Tests(unittest.TestCase):
         attr_checker = DummyAttrChecker()
         result = index.search('/bb', depth=2, attr_checker=attr_checker)
         self.assertEqual(sorted(result), [6, 7, 8, 15, 16, 17, 18, 19, 20])
-        results = attr_checker.results
+        results = sorted(attr_checker.results)
         self.assertEqual(len(results), 2)
         attrs, theset = results[0]
         self.assertEqual(attrs, (0, ['acl1']))
@@ -676,7 +676,7 @@ class CatalogPathIndex2Tests(unittest.TestCase):
         attr_checker = DummyAttrChecker()
         result = index.search('/bb', depth=3, attr_checker=attr_checker)
         self.assertEqual(sorted(result), [6, 7, 8, 15, 16, 17, 18, 19, 20])
-        results = attr_checker.results
+        results = sorted(attr_checker.results)
         self.assertEqual(len(results), 2)
         attrs, theset = results[0]
         self.assertEqual(attrs, (0, ['acl1']))
@@ -690,7 +690,7 @@ class CatalogPathIndex2Tests(unittest.TestCase):
         attr_checker = DummyAttrChecker()
         result = index.search('/bb/cc', attr_checker=attr_checker)
         self.assertEqual(sorted(result), [19, 20])
-        results = attr_checker.results
+        results = sorted(attr_checker.results)
         self.assertEqual(len(results), 2)
         attrs, theset = results[0]
         self.assertEqual(attrs, (0, ['acl1']))
@@ -705,7 +705,7 @@ class CatalogPathIndex2Tests(unittest.TestCase):
         result = index.search('/bb/cc', include_path=True,
                               attr_checker=attr_checker)
         self.assertEqual(sorted(result), [8, 19, 20])
-        results = attr_checker.results
+        results = sorted(attr_checker.results)
         self.assertEqual(len(results), 2)
         attrs, theset = results[0]
         self.assertEqual(attrs, (0, ['acl1']))
@@ -719,7 +719,7 @@ class CatalogPathIndex2Tests(unittest.TestCase):
         attr_checker = DummyAttrChecker()
         result = index.search('/bb/cc', depth=0, attr_checker=attr_checker)
         self.assertEqual(sorted(result), [])
-        results = attr_checker.results
+        results = sorted(attr_checker.results)
         self.assertEqual(len(results), 2)
         attrs, theset = results[0]
         self.assertEqual(attrs, (0, ['acl1']))
@@ -733,7 +733,7 @@ class CatalogPathIndex2Tests(unittest.TestCase):
         attr_checker = DummyAttrChecker()
         result = index.search('/bb/cc', depth=1, attr_checker=attr_checker)
         self.assertEqual(sorted(result), [19, 20])
-        results = attr_checker.results
+        results = sorted(attr_checker.results)
         self.assertEqual(len(results), 2)
         attrs, theset = results[0]
         self.assertEqual(attrs, (0, ['acl1']))
@@ -747,7 +747,7 @@ class CatalogPathIndex2Tests(unittest.TestCase):
         attr_checker = DummyAttrChecker()
         result = index.search('/bb/cc', depth=2, attr_checker=attr_checker)
         self.assertEqual(sorted(result), [19, 20])
-        results = attr_checker.results
+        results = sorted(attr_checker.results)
         self.assertEqual(len(results), 2)
         attrs, theset = results[0]
         self.assertEqual(attrs, (0, ['acl1']))
@@ -761,7 +761,7 @@ class CatalogPathIndex2Tests(unittest.TestCase):
         attr_checker = DummyAttrChecker()
         result = index.search('/bb/cc/11.html', attr_checker=attr_checker)
         self.assertEqual(sorted(result), [])
-        results = attr_checker.results
+        results = sorted(attr_checker.results)
         self.assertEqual(len(results), 2)
         attrs, theset = results[0]
         self.assertEqual(attrs, (0, ['acl1']))
@@ -776,7 +776,7 @@ class CatalogPathIndex2Tests(unittest.TestCase):
         result = index.search('/bb/cc/11.html', include_path=True,
                               attr_checker=attr_checker)
         self.assertEqual(sorted(result), [19])
-        results = attr_checker.results
+        results = sorted(attr_checker.results)
         self.assertEqual(len(results), 2)
         attrs, theset = results[0]
         self.assertEqual(attrs, (0, ['acl1']))
@@ -791,7 +791,7 @@ class CatalogPathIndex2Tests(unittest.TestCase):
         result = index.search('/bb/cc/11.html', depth=0,
                               attr_checker=attr_checker)
         self.assertEqual(sorted(result), [])
-        results = attr_checker.results
+        results = sorted(attr_checker.results)
         self.assertEqual(len(results), 2)
         attrs, theset = results[0]
         self.assertEqual(attrs, (0, ['acl1']))
@@ -806,7 +806,7 @@ class CatalogPathIndex2Tests(unittest.TestCase):
         result = index.search('/bb/cc/11.html', depth=1,
                               attr_checker=attr_checker)
         self.assertEqual(sorted(result), [])
-        results = attr_checker.results
+        results = sorted(attr_checker.results)
         self.assertEqual(len(results), 2)
         attrs, theset = results[0]
         self.assertEqual(attrs, (0, ['acl1']))
@@ -821,7 +821,7 @@ class CatalogPathIndex2Tests(unittest.TestCase):
         result = index.search('/bb/cc/11.html', depth=1, include_path=True,
                               attr_checker=attr_checker)
         self.assertEqual(sorted(result), [19])
-        results = attr_checker.results
+        results = sorted(attr_checker.results)
         self.assertEqual(len(results), 2)
         attrs, theset = results[0]
         self.assertEqual(attrs, (0, ['acl1']))
@@ -835,24 +835,24 @@ class CatalogPathIndex2Tests(unittest.TestCase):
         attr_checker = DummyAttrChecker()
         result = index.search('/', attr_checker=attr_checker)
         self.assertEqual(sorted(result), range(1, 6))
-        results = attr_checker.results
+        results = sorted(attr_checker.results)
         self.assertEqual(len(results), 6)
-        attrs, theset = results[0]
+        attrs, theset = results[1]
         self.assertEqual(attrs, (1, ['acl1', 'acl2']))
         self.assertEqual(list(theset), [1])
-        attrs, theset = results[1]
+        attrs, theset = results[3]
         self.assertEqual(attrs, (3, ['acl1', 'acl2', 'acl4']))
         self.assertEqual(list(theset), [3])
-        attrs, theset = results[2]
+        attrs, theset = results[4]
         self.assertEqual(attrs, (4, ['acl1', 'acl2', 'acl5']))
         self.assertEqual(list(theset), [4])
-        attrs, theset = results[3]
+        attrs, theset = results[2]
         self.assertEqual(attrs, (2, ['acl1', 'acl2', 'acl3']))
         self.assertEqual(list(theset), [2])
-        attrs, theset = results[4]
+        attrs, theset = results[5]
         self.assertEqual(attrs, (5, ['acl1', 'acl6']))
         self.assertEqual(list(theset), [5])
-        attrs, theset = results[5]
+        attrs, theset = results[0]
         self.assertEqual(attrs, (0, ['acl1']))
         self.assertEqual(list(theset), [])
 
@@ -861,24 +861,24 @@ class CatalogPathIndex2Tests(unittest.TestCase):
         attr_checker = DummyAttrChecker()
         result = index.search('/', include_path=True, attr_checker=attr_checker)
         self.assertEqual(sorted(result), range(0, 6))
-        results = attr_checker.results
+        results = sorted(attr_checker.results)
         self.assertEqual(len(results), 6)
-        attrs, theset = results[0]
+        attrs, theset = results[1]
         self.assertEqual(attrs, (1, ['acl1', 'acl2']))
         self.assertEqual(list(theset), [1])
-        attrs, theset = results[1]
+        attrs, theset = results[3]
         self.assertEqual(attrs, (3, ['acl1', 'acl2', 'acl4']))
         self.assertEqual(list(theset), [3])
-        attrs, theset = results[2]
+        attrs, theset = results[4]
         self.assertEqual(attrs, (4, ['acl1', 'acl2', 'acl5']))
         self.assertEqual(list(theset), [4])
-        attrs, theset = results[3]
+        attrs, theset = results[2]
         self.assertEqual(attrs, (2, ['acl1', 'acl2', 'acl3']))
         self.assertEqual(list(theset), [2])
-        attrs, theset = results[4]
+        attrs, theset = results[5]
         self.assertEqual(attrs, (5, ['acl1', 'acl6']))
         self.assertEqual(list(theset), [5])
-        attrs, theset = results[5]
+        attrs, theset = results[0]
         self.assertEqual(attrs, (0, ['acl1']))
         self.assertEqual(list(theset), [0])
 
@@ -887,7 +887,7 @@ class CatalogPathIndex2Tests(unittest.TestCase):
         attr_checker = DummyAttrChecker()
         result = index.search('/', depth=0, attr_checker=attr_checker)
         self.assertEqual(sorted(result), [])
-        results = attr_checker.results
+        results = sorted(attr_checker.results)
         self.assertEqual(len(results), 1)
         attrs, theset = results[0]
         self.assertEqual(attrs, (0, ['acl1']))
@@ -899,7 +899,7 @@ class CatalogPathIndex2Tests(unittest.TestCase):
         result = index.search('/', include_path=True, depth=0,
                               attr_checker=attr_checker)
         self.assertEqual(sorted(result), [0])
-        results = attr_checker.results
+        results = sorted(attr_checker.results)
         self.assertEqual(len(results), 1)
         attrs, theset = results[0]
         self.assertEqual(attrs, (0, ['acl1']))
@@ -910,15 +910,15 @@ class CatalogPathIndex2Tests(unittest.TestCase):
         attr_checker = DummyAttrChecker()
         result = index.search('/', depth=1, attr_checker=attr_checker)
         self.assertEqual(sorted(result), [1,5])
-        results = attr_checker.results
+        results = sorted(attr_checker.results)
         self.assertEqual(len(results), 3)
-        attrs, theset = results[0]
+        attrs, theset = results[2]
         self.assertEqual(attrs, (5, ['acl1', 'acl6']))
         self.assertEqual(list(theset), [5])
         attrs, theset = results[1]
         self.assertEqual(attrs, (1, ['acl1', 'acl2']))
         self.assertEqual(list(theset), [1])
-        attrs, theset = results[2]
+        attrs, theset = results[0]
         self.assertEqual(attrs, (0, ['acl1']))
         self.assertEqual(list(theset), [])
 
@@ -928,15 +928,15 @@ class CatalogPathIndex2Tests(unittest.TestCase):
         result = index.search('/', include_path=True, depth=1,
                               attr_checker=attr_checker)
         self.assertEqual(sorted(result), [0, 1, 5])
-        results = attr_checker.results
+        results = sorted(attr_checker.results)
         self.assertEqual(len(results), 3)
-        attrs, theset = results[0]
+        attrs, theset = results[2]
         self.assertEqual(attrs, (5, ['acl1', 'acl6']))
         self.assertEqual(list(theset), [5])
         attrs, theset = results[1]
         self.assertEqual(attrs, (1, ['acl1', 'acl2']))
         self.assertEqual(list(theset), [1])
-        attrs, theset = results[2]
+        attrs, theset = results[0]
         self.assertEqual(attrs, (0, ['acl1']))
         self.assertEqual(list(theset), [0])
 
