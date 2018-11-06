@@ -2,7 +2,7 @@ import bisect
 import heapq
 from itertools import islice
 
-from zope.interface import implements
+from zope.interface import implementer
 
 from zope.index.field import FieldIndex
 
@@ -17,6 +17,7 @@ NBEST = 'nbest'
 TIMSORT = 'timsort'
 
 
+@implementer(ICatalogIndex)
 class CatalogFieldIndex(CatalogIndex, FieldIndex):
     """ Field indexing.
 
@@ -46,11 +47,10 @@ class CatalogFieldIndex(CatalogIndex, FieldIndex):
 
     - NotInRange
     """
-    implements(ICatalogIndex)
 
     def __init__(self, discriminator):
         if not callable(discriminator):
-            if not isinstance(discriminator, basestring):
+            if not isinstance(discriminator, str):
                 raise ValueError('discriminator value must be callable or a '
                                  'string')
         self.discriminator = discriminator
@@ -73,14 +73,14 @@ class CatalogFieldIndex(CatalogIndex, FieldIndex):
         rev_index = self._rev_index
         value = rev_index.get(docid, _marker)
         if value is _marker:
-            return # not in index
+            return  # not in index
 
         del rev_index[docid]
 
         try:
             set = self._fwd_index[value]
             set.remove(docid)
-        except KeyError:    #pragma NO COVERAGE
+        except KeyError:    # pragma NO COVERAGE
             # This is fishy, but we don't want to raise an error.
             # We should probably log something.
             # but keep it from throwing a dirty exception
@@ -173,21 +173,21 @@ class CatalogFieldIndex(CatalogIndex, FieldIndex):
         for set in fwd_index.values():
             for docid in set:
                 if docid in docids:
-                    n+=1
+                    n += 1
                     yield docid
                     if limit and n >= limit:
                         raise StopIteration
 
     def nbest_ascending(self, docids, limit):
-        if limit is None: #pragma NO COVERAGE
-            raise RuntimeError, 'n-best used without limit'
+        if limit is None:  # pragma NO COVERAGE
+            raise RuntimeError('n-best used without limit')
 
         # lifted from heapq.nsmallest
 
         h = nsort(docids, self._rev_index)
         it = iter(h)
         result = sorted(islice(it, 0, limit))
-        if not result: #pragma NO COVERAGE
+        if not result:  # pragma NO COVERAGE
             raise StopIteration
         insort = bisect.insort
         pop = result.pop
@@ -203,8 +203,8 @@ class CatalogFieldIndex(CatalogIndex, FieldIndex):
             yield docid
 
     def nbest_descending(self, docids, limit):
-        if limit is None: #pragma NO COVERAGE
-            raise RuntimeError, 'N-Best used without limit'
+        if limit is None:  # pragma NO COVERAGE
+            raise RuntimeError('N-Best used without limit')
         iterable = nsort(docids, self._rev_index)
         for value, docid in heapq.nlargest(limit, iterable):
             yield docid
@@ -346,7 +346,7 @@ def fwscan_wins(limit, rlen, numdocs):
         # this.
         if 512/div <= docratio < 1024/div and limitratio <= 4/div:
             return True
-        elif  1024/div <= docratio < 2048/div and limitratio <= 32/div:
+        elif 1024/div <= docratio < 2048/div and limitratio <= 32/div:
             return True
         elif 2048/div <= docratio < 4096/div and limitratio <= 128/div:
             return True

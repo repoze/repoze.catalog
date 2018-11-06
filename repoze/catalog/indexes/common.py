@@ -12,7 +12,7 @@ class CatalogIndex(object):
 
     def __init__(self, discriminator):
         if not callable(discriminator):
-            if not isinstance(discriminator, basestring):
+            if not isinstance(discriminator, str):
                 raise ValueError('discriminator value must be callable or a '
                                  'string')
         self.discriminator = discriminator

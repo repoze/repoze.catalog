@@ -1,4 +1,4 @@
-from zope.interface import implements
+from zope.interface import implementer
 from persistent import Persistent
 
 import BTrees
@@ -10,6 +10,8 @@ from repoze.catalog.indexes.common import CatalogIndex
 
 _marker = ()
 
+
+@implementer(ICatalogIndex)
 class CatalogPathIndex(CatalogIndex):
 
     """Index for model paths (tokens separated by '/' characters)
@@ -33,14 +35,13 @@ class CatalogPathIndex(CatalogIndex):
     - NotEq
 
     """
-    implements(ICatalogIndex)
     useOperator = 'or'
 
     family = BTrees.family32
 
     def __init__(self, discriminator):
         if not callable(discriminator):
-            if not isinstance(discriminator, basestring):
+            if not isinstance(discriminator, str):
                 raise ValueError('discriminator value must be callable or a '
                                  'string')
         self.discriminator = discriminator
@@ -61,7 +62,7 @@ class CatalogPathIndex(CatalogIndex):
            level is the level of the component inside the path
         """
 
-        if not self._index.has_key(comp):
+        if not self._index.has_key(comp):  # noqa
             self._index[comp] = self.family.IO.BTree()
 
         if not self._index[comp].has_key(level):
@@ -97,11 +98,11 @@ class CatalogPathIndex(CatalogIndex):
         path = value
 
         if isinstance(path, (list, tuple)):
-            path = '/'+ '/'.join(path[1:])
+            path = '/' + '/'.join(path[1:])
 
         comps = filter(None, path.split('/'))
 
-        if not self._unindex.has_key(docid):
+        if not self._unindex.has_key(docid):  # noqa
             self._length.change(1)
 
         for i in range(len(comps)):
@@ -115,7 +116,7 @@ class CatalogPathIndex(CatalogIndex):
         if docid in _not_indexed:
             _not_indexed.remove(docid)
 
-        if not self._unindex.has_key(docid):
+        if not self._unindex.has_key(docid):  # noqa
             return
 
         comps =  self._unindex[docid].split('/')
@@ -149,11 +150,11 @@ class CatalogPathIndex(CatalogIndex):
         level >= 0  starts searching at the given level
         level <  0  not implemented yet
         """
-        if isinstance(path, basestring):
+        if isinstance(path, str):
             level = default_level
         else:
             level = int(path[1])
-            path  = path[0]
+            path = path[0]
 
         comps = filter(None, path.split('/'))
 
@@ -163,7 +164,7 @@ class CatalogPathIndex(CatalogIndex):
         results = None
         if level >= 0:
             for i, comp in enumerate(comps):
-                if not self._index.has_key(comp):
+                if not self._index.has_key(comp):  # noqa
                     return self.family.IF.Set()
                 if not self._index[comp].has_key(level+i):
                     return self.family.IF.Set()
@@ -199,14 +200,14 @@ class CatalogPathIndex(CatalogIndex):
         level = 0
         operator = self.useOperator
 
-        if isinstance(query, basestring):
+        if isinstance(query, str):
             paths = [query]
         elif isinstance(query, (tuple, list)):
             paths = query
         else:
             paths = query.get('query', [])
-            if isinstance(paths, basestring):
-                paths = [ paths ]
+            if isinstance(paths, str):
+                paths = [paths]
             level = query.get('level', 0)
             operator = query.get('operator', self.useOperator).lower()
 
@@ -219,7 +220,7 @@ class CatalogPathIndex(CatalogIndex):
 
         else:
             rs = None
-            sets.sort(lambda x, y: cmp(len(x), len(y)))
+            sets.sort(lambda a, b: (len(a) > len(b)) - (len(a) < len(b)))
             for set in sets:
                 rs = self.family.IF.intersection(rs, set)
                 if not rs:
