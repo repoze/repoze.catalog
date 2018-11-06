@@ -2,14 +2,14 @@ import BTrees
 from persistent.mapping import PersistentMapping
 import transaction
 
-from zope.interface import implements
+from zope.interface import implementer
 
 from repoze.catalog.interfaces import ICatalog
 from repoze.catalog.interfaces import ICatalogIndex
 
-class Catalog(PersistentMapping):
 
-    implements(ICatalog)
+@implementer(ICatalog)
+class Catalog(PersistentMapping):
 
     family = BTrees.family32
 
@@ -145,9 +145,9 @@ class Catalog(PersistentMapping):
         (num, resultseq)."""
         try:
             from repoze.catalog.query import parse_query
-            if isinstance(queryobject, basestring):
+            if isinstance(queryobject, str):
                 queryobject = parse_query(queryobject)
-        except ImportError: #pragma NO COVERAGE
+        except ImportError:  # pragma NO COVERAGE
             pass
         results = queryobject._apply(self, names)
         return self.sort_result(results, sort_index, limit, sort_type, reverse)

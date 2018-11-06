@@ -90,7 +90,7 @@ class TestCatalogTextIndex(unittest.TestCase):
 
     def test_applyDoesNotContain_with_unindexed_doc(self):
         def discriminator(obj, default):
-            if isinstance(obj, basestring):
+            if isinstance(obj, str):
                 return obj
             return default
         index = self._makeOne(discriminator)
