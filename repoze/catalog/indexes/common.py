@@ -2,6 +2,8 @@ from persistent import Persistent
 from ZODB.broken import Broken
 import BTrees
 
+from repoze.catalog.compat import text_type
+
 _marker = ()
 
 
@@ -12,7 +14,7 @@ class CatalogIndex(object):
 
     def __init__(self, discriminator):
         if not callable(discriminator):
-            if not isinstance(discriminator, str):
+            if not isinstance(discriminator, text_type):
                 raise ValueError('discriminator value must be callable or a '
                                  'string')
         self.discriminator = discriminator

@@ -6,6 +6,7 @@ from zope.interface import implementer
 
 from repoze.catalog.interfaces import ICatalog
 from repoze.catalog.interfaces import ICatalogIndex
+from repoze.catalog.compat import text_type
 
 
 @implementer(ICatalog)
@@ -145,7 +146,7 @@ class Catalog(PersistentMapping):
         (num, resultseq)."""
         try:
             from repoze.catalog.query import parse_query
-            if isinstance(queryobject, str):
+            if isinstance(queryobject, text_type):
                 queryobject = parse_query(queryobject)
         except ImportError:  # pragma NO COVERAGE
             pass

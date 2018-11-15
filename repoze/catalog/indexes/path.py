@@ -7,6 +7,7 @@ from BTrees.Length import Length
 
 from repoze.catalog.interfaces import ICatalogIndex
 from repoze.catalog.indexes.common import CatalogIndex
+from repoze.catalog.compat import text_type
 
 _marker = ()
 
@@ -41,7 +42,7 @@ class CatalogPathIndex(CatalogIndex):
 
     def __init__(self, discriminator):
         if not callable(discriminator):
-            if not isinstance(discriminator, str):
+            if not isinstance(discriminator, text_type):
                 raise ValueError('discriminator value must be callable or a '
                                  'string')
         self.discriminator = discriminator
@@ -119,7 +120,7 @@ class CatalogPathIndex(CatalogIndex):
         if not self._unindex.has_key(docid):  # noqa
             return
 
-        comps =  self._unindex[docid].split('/')
+        comps = self._unindex[docid].split('/')
 
         for level in range(len(comps[1:])):
             comp = comps[level+1]
@@ -150,7 +151,7 @@ class CatalogPathIndex(CatalogIndex):
         level >= 0  starts searching at the given level
         level <  0  not implemented yet
         """
-        if isinstance(path, str):
+        if isinstance(path, text_type):
             level = default_level
         else:
             level = int(path[1])
@@ -200,13 +201,13 @@ class CatalogPathIndex(CatalogIndex):
         level = 0
         operator = self.useOperator
 
-        if isinstance(query, str):
+        if isinstance(query, text_type):
             paths = [query]
         elif isinstance(query, (tuple, list)):
             paths = query
         else:
             paths = query.get('query', [])
-            if isinstance(paths, str):
+            if isinstance(paths, text_type):
                 paths = [paths]
             level = query.get('level', 0)
             operator = query.get('operator', self.useOperator).lower()

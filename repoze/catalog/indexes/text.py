@@ -5,6 +5,7 @@ from zope.index.text import TextIndex
 
 from repoze.catalog.interfaces import ICatalogIndex
 from repoze.catalog.indexes.common import CatalogIndex
+from repoze.catalog.compat import text_type
 
 
 @implementer(ICatalogIndex, IIndexSort)
@@ -24,7 +25,7 @@ class CatalogTextIndex(CatalogIndex, TextIndex):
 
     def __init__(self, discriminator, lexicon=None, index=None):
         if not callable(discriminator):
-            if not isinstance(discriminator, str):
+            if not isinstance(discriminator, text_type):
                 raise ValueError('discriminator value must be callable or a '
                                  'string')
         self.discriminator = discriminator

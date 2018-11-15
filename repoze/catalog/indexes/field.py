@@ -9,6 +9,7 @@ from zope.index.field import FieldIndex
 from repoze.catalog.interfaces import ICatalogIndex
 from repoze.catalog.indexes.common import CatalogIndex
 from repoze.catalog import RangeValue
+from repoze.catalog.compat import text_type
 
 _marker = []
 
@@ -50,7 +51,7 @@ class CatalogFieldIndex(CatalogIndex, FieldIndex):
 
     def __init__(self, discriminator):
         if not callable(discriminator):
-            if not isinstance(discriminator, str):
+            if not isinstance(discriminator, text_type):
                 raise ValueError('discriminator value must be callable or a '
                                  'string')
         self.discriminator = discriminator

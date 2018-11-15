@@ -8,6 +8,7 @@ from zope.interface import implementer
 
 from repoze.catalog.indexes.keyword import CatalogKeywordIndex
 from repoze.catalog.interfaces import ICatalogIndex
+from repoze.catalog.compat import text_type
 
 _marker = ()
 
@@ -37,7 +38,7 @@ class CatalogFacetIndex(CatalogKeywordIndex):
 
     def __init__(self, discriminator, facets, family=None):
         if not callable(discriminator):
-            if not isinstance(discriminator, str):
+            if not isinstance(discriminator, text_type):
                 raise ValueError('discriminator value must be callable or a '
                                  'string')
         self.discriminator = discriminator
