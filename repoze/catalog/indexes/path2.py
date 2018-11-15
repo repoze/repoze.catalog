@@ -4,6 +4,7 @@ import BTrees
 
 from repoze.catalog.interfaces import ICatalogIndex
 from repoze.catalog.indexes.common import CatalogIndex
+from repoze.catalog.compat import text_type
 
 _marker = object()
 
@@ -38,12 +39,12 @@ class CatalogPathIndex2(CatalogIndex):  # pragma NO COVERAGE
 
     def __init__(self, discriminator, attr_discriminator=None):
         if not callable(discriminator):
-            if not isinstance(discriminator, str):
+            if not isinstance(discriminator, text_type):
                 raise ValueError('discriminator value must be callable or a '
                                  'string')
         self.discriminator = discriminator
         if attr_discriminator is not None and not callable(attr_discriminator):
-            if not isinstance(attr_discriminator, str):
+            if not isinstance(attr_discriminator, text_type):
                 raise ValueError('attr_discriminator value must be callable '
                                  'or a string')
         self.attr_discriminator = attr_discriminator
@@ -66,7 +67,7 @@ class CatalogPathIndex2(CatalogIndex):  # pragma NO COVERAGE
         if not path:
             raise ValueError('path must be nonempty (not %s)' % str(path))
 
-        if isinstance(path, str):
+        if isinstance(path, text_type):
             path = path.rstrip('/')
             path = tuple(path.split('/'))
 
@@ -355,7 +356,7 @@ class CatalogPathIndex2(CatalogIndex):  # pragma NO COVERAGE
         documentation for the ``search`` method of this class to
         understand paths, depths, and the ``include_path`` argument.
         """
-        if isinstance(query, (str, tuple, list)):
+        if isinstance(query, (text_type, tuple, list)):
             path = query
             depth = None
             include_path = False
