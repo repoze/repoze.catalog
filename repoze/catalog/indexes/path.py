@@ -63,10 +63,10 @@ class CatalogPathIndex(CatalogIndex):
            level is the level of the component inside the path
         """
 
-        if not self._index.has_key(comp):  # noqa
+        if comp not in self._index:
             self._index[comp] = self.family.IO.BTree()
 
-        if not self._index[comp].has_key(level):
+        if level not in self._index[comp]:
             self._index[comp][level] = self.family.IF.TreeSet()
 
         self._index[comp][level].insert(id)
@@ -103,7 +103,7 @@ class CatalogPathIndex(CatalogIndex):
 
         comps = filter(None, path.split('/'))
 
-        if not self._unindex.has_key(docid):  # noqa
+        if docid not in self._unindex:
             self._length.change(1)
 
         for i in range(len(comps)):
@@ -117,7 +117,7 @@ class CatalogPathIndex(CatalogIndex):
         if docid in _not_indexed:
             _not_indexed.remove(docid)
 
-        if not self._unindex.has_key(docid):  # noqa
+        if docid not in self._unindex:
             return
 
         comps = self._unindex[docid].split('/')
@@ -165,9 +165,9 @@ class CatalogPathIndex(CatalogIndex):
         results = None
         if level >= 0:
             for i, comp in enumerate(comps):
-                if not self._index.has_key(comp):  # noqa
+                if comp not in self._index:
                     return self.family.IF.Set()
-                if not self._index[comp].has_key(level+i):
+                if (level + i) not in self._index[comp]:
                     return self.family.IF.Set()
                 results = self.family.IF.intersection(
                     results, self._index[comp][level+i])
