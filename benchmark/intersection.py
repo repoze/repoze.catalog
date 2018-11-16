@@ -166,7 +166,7 @@ def do_benchmark(fname, nd, nk1, nk2, out=sys.stdout):
             self.one = str(docid % nk1)
             self.two = str(docid % nk2)
 
-    for docid in xrange(nd):
+    for docid in range(nd):
         catalog.index_doc(docid, Document(docid))
     manager.commit()
     manager.close()
@@ -174,7 +174,7 @@ def do_benchmark(fname, nd, nk1, nk2, out=sys.stdout):
     N_QUERIES = 1000
     print >>out, "Running %d queries for each algorithm..." % N_QUERIES
     catalog = factory(manager)
-    for _ in xrange(1000):
+    for _ in range(1000):
         key1 = random.randrange(nk1)
         key2 = random.randrange(nk2)
         query1 = Intersection1(Eq('one', str(key1)), Eq('two', str(key2)))
@@ -217,8 +217,8 @@ def _range_order_of_magnitude(n):
     # Iterate over (at most) 3 orders of magnitude
     n_magnitude = int(math.ceil(math.log10(n)))
     lowest_magnitude = max(0, n_magnitude - 3)
-    for magnitude in xrange(lowest_magnitude, n_magnitude):
-        for i in xrange(1,10):
+    for magnitude in range(lowest_magnitude, n_magnitude):
+        for i in range(1,10):
             value = i * 10**magnitude
             if value >= n:
                 break

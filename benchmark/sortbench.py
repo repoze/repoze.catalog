@@ -194,7 +194,7 @@ class FieldIndexForwardSort:
             test = sortname1 == 'nbest' and sortname2 == 'timsort'
             test_fn = nbest_ascending_wins
 
-            for x in xrange(0, min(len(values1), len(values2))):
+            for x in range(0, min(len(values1), len(values2))):
                 t1 = values1[x]
                 t2 = values2[x]
                 limit = self.limits[x]
@@ -267,7 +267,7 @@ class FieldIndexForwardSort:
 
 def timer(fn, *args, **kw):
     times = []
-    for x in xrange(7):
+    for x in range(7):
         start = time.time()
         result = fn(*args, **kw)
         if not hasattr(result, '__len__'):
