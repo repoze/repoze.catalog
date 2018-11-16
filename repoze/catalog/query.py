@@ -36,7 +36,7 @@ class Query(object):
         return ()
 
     def print_tree(self, out=sys.stdout, level=0):
-        print('  ' * level + str(self), file=out)
+        out.write(u'{}{}\n'.format(u'  ' * level, str(self)))
         for child in self.iter_children():
             child.print_tree(out, level + 1)
 
