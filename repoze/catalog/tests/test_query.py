@@ -59,7 +59,7 @@ class TestQuery(unittest.TestCase):
             def iter_children(self):
                 return self.children
 
-        from io import StringIO
+        from StringIO import StringIO
         a = Derived('A')
         b = Derived('B')
         c = Derived('C')
@@ -1085,7 +1085,7 @@ class Test_parse_query(unittest.TestCase):
         from repoze.catalog.query import Gt
         from repoze.catalog.query import And
         from repoze.catalog.query import InRange
-        op = self._call_fut("a >= 0 and b == 2 and c > 3 and a <= 1")
+        op = self._call_fut("a >= -1 and b == 2 and c > 3 and a <= 1")
         self.failUnless(isinstance(op, And))
         self.failUnless(isinstance(op.queries[0], InRange))
         self.failUnless(isinstance(op.queries[1], Eq))
@@ -1096,7 +1096,7 @@ class Test_parse_query(unittest.TestCase):
         from repoze.catalog.query import Gt
         from repoze.catalog.query import And
         from repoze.catalog.query import InRange
-        op = self._call_fut("b == 2 and a > 0 and (a <= 1 and c > 3)")
+        op = self._call_fut("b == 2 and a > -1 and (a <= 1 and c > 3)")
         self.failUnless(isinstance(op, And))
         self.failUnless(isinstance(op.queries[0], Eq))
         self.failUnless(isinstance(op.queries[1], InRange))

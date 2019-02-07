@@ -12,7 +12,7 @@
 #
 ##############################################################################
 
-__version__ = '0.9.0'
+__version__ = '0.8.3'
 
 import os
 
@@ -45,10 +45,6 @@ setup(name='repoze.catalog',
         "Programming Language :: Python :: 2",
         "Programming Language :: Python :: 2.6",
         "Programming Language :: Python :: 2.7",
-        "Programming Language :: Python :: 3.4",
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: Implementation :: CPython",
         "Topic :: Internet :: WWW/HTTP :: Indexing/Search",
         ],

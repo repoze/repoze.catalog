@@ -1,4 +1,4 @@
-from zope.interface import implementer
+from zope.interface import implements
 from persistent import Persistent
 
 import BTrees
@@ -7,12 +7,9 @@ from BTrees.Length import Length
 
 from repoze.catalog.interfaces import ICatalogIndex
 from repoze.catalog.indexes.common import CatalogIndex
-from repoze.catalog.compat import text_type
 
 _marker = ()
 
-
-@implementer(ICatalogIndex)
 class CatalogPathIndex(CatalogIndex):
 
     """Index for model paths (tokens separated by '/' characters)
@@ -36,13 +33,14 @@ class CatalogPathIndex(CatalogIndex):
     - NotEq
 
     """
+    implements(ICatalogIndex)
     useOperator = 'or'
 
     family = BTrees.family32
 
     def __init__(self, discriminator):
         if not callable(discriminator):
-            if not isinstance(discriminator, text_type):
+            if not isinstance(discriminator, basestring):
                 raise ValueError('discriminator value must be callable or a '
                                  'string')
         self.discriminator = discriminator
@@ -63,10 +61,10 @@ class CatalogPathIndex(CatalogIndex):
            level is the level of the component inside the path
         """
 
-        if comp not in self._index:
+        if not self._index.has_key(comp):
             self._index[comp] = self.family.IO.BTree()
 
-        if level not in self._index[comp]:
+        if not self._index[comp].has_key(level):
             self._index[comp][level] = self.family.IF.TreeSet()
 
         self._index[comp][level].insert(id)
@@ -99,11 +97,11 @@ class CatalogPathIndex(CatalogIndex):
         path = value
 
         if isinstance(path, (list, tuple)):
-            path = '/' + '/'.join(path[1:])
+            path = '/'+ '/'.join(path[1:])
 
         comps = filter(None, path.split('/'))
 
-        if docid not in self._unindex:
+        if not self._unindex.has_key(docid):
             self._length.change(1)
 
         for i in range(len(comps)):
@@ -117,10 +115,10 @@ class CatalogPathIndex(CatalogIndex):
         if docid in _not_indexed:
             _not_indexed.remove(docid)
 
-        if docid not in self._unindex:
+        if not self._unindex.has_key(docid):
             return
 
-        comps = self._unindex[docid].split('/')
+        comps =  self._unindex[docid].split('/')
 
         for level in range(len(comps[1:])):
             comp = comps[level+1]
@@ -151,11 +149,11 @@ class CatalogPathIndex(CatalogIndex):
         level >= 0  starts searching at the given level
         level <  0  not implemented yet
         """
-        if isinstance(path, text_type):
+        if isinstance(path, basestring):
             level = default_level
         else:
             level = int(path[1])
-            path = path[0]
+            path  = path[0]
 
         comps = filter(None, path.split('/'))
 
@@ -165,9 +163,9 @@ class CatalogPathIndex(CatalogIndex):
         results = None
         if level >= 0:
             for i, comp in enumerate(comps):
-                if comp not in self._index:
+                if not self._index.has_key(comp):
                     return self.family.IF.Set()
-                if (level + i) not in self._index[comp]:
+                if not self._index[comp].has_key(level+i):
                     return self.family.IF.Set()
                 results = self.family.IF.intersection(
                     results, self._index[comp][level+i])
@@ -201,14 +199,14 @@ class CatalogPathIndex(CatalogIndex):
         level = 0
         operator = self.useOperator
 
-        if isinstance(query, text_type):
+        if isinstance(query, basestring):
             paths = [query]
         elif isinstance(query, (tuple, list)):
             paths = query
         else:
             paths = query.get('query', [])
-            if isinstance(paths, text_type):
-                paths = [paths]
+            if isinstance(paths, basestring):
+                paths = [ paths ]
             level = query.get('level', 0)
             operator = query.get('operator', self.useOperator).lower()
 
@@ -221,7 +219,7 @@ class CatalogPathIndex(CatalogIndex):
 
         else:
             rs = None
-            sets.sort(lambda a, b: (len(a) > len(b)) - (len(a) < len(b)))
+            sets.sort(lambda x, y: cmp(len(x), len(y)))
             for set in sets:
                 rs = self.family.IF.intersection(rs, set)
                 if not rs:
