@@ -1,4 +1,3 @@
-# Wire up travis
 language: python
 sudo : false
 
