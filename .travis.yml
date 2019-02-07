@@ -1,0 +1,17 @@
+# Wire up travis
+language: python
+sudo : false
+
+env:
+  - TOXENV=py27
+  - TOXENV=cover
+
+install:
+  - travis_retry pip install tox
+
+script:
+  - travis_retry tox
+
+notifications:
+  email:
+    - repoze-checkins@lists.repoze.org
