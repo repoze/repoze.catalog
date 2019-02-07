@@ -1,16 +1,14 @@
-from zope.interface import implementer
+from zope.interface import implements
 
 import BTrees
 
 from repoze.catalog.interfaces import ICatalogIndex
 from repoze.catalog.indexes.common import CatalogIndex
-from repoze.catalog.compat import text_type
 
 _marker = object()
 
 
-@implementer(ICatalogIndex)
-class CatalogPathIndex2(CatalogIndex):  # pragma NO COVERAGE
+class CatalogPathIndex2(CatalogIndex):  #pragma NO COVERAGE
     """
     DEPRECATED
 
@@ -33,18 +31,19 @@ class CatalogPathIndex2(CatalogIndex):  # pragma NO COVERAGE
     Eq
 
     """
-    attr_discriminator = None  # b/w compat
+    implements(ICatalogIndex)
+    attr_discriminator = None # b/w compat
 
     family = BTrees.family32
 
     def __init__(self, discriminator, attr_discriminator=None):
         if not callable(discriminator):
-            if not isinstance(discriminator, text_type):
+            if not isinstance(discriminator, basestring):
                 raise ValueError('discriminator value must be callable or a '
                                  'string')
         self.discriminator = discriminator
         if attr_discriminator is not None and not callable(attr_discriminator):
-            if not isinstance(attr_discriminator, text_type):
+            if not isinstance(attr_discriminator, basestring):
                 raise ValueError('attr_discriminator value must be callable '
                                  'or a string')
         self.attr_discriminator = attr_discriminator
@@ -67,7 +66,7 @@ class CatalogPathIndex2(CatalogIndex):  # pragma NO COVERAGE
         if not path:
             raise ValueError('path must be nonempty (not %s)' % str(path))
 
-        if isinstance(path, text_type):
+        if isinstance(path, basestring):
             path = path.rstrip('/')
             path = tuple(path.split('/'))
 
@@ -241,7 +240,7 @@ class CatalogPathIndex2(CatalogIndex):  # pragma NO COVERAGE
             try:
                 docid = self.path_to_docid[path]
             except KeyError:
-                pass  # XXX should we just return an empty set?
+                pass # XXX should we just return an empty set?
             else:
                 sets.append(self.family.IF.Set([docid]))
 
@@ -301,7 +300,7 @@ class CatalogPathIndex2(CatalogIndex):  # pragma NO COVERAGE
             try:
                 docid = self.path_to_docid[nextpath]
             except KeyError:
-                continue  # XXX we can't search from an unindexed root path?
+                continue # XXX we can't search from an unindexed root path?
             attr = self.docid_to_attr.get(docid, _marker)
             if attr is _marker:
                 if include_path and nextpath == path:
@@ -356,7 +355,7 @@ class CatalogPathIndex2(CatalogIndex):  # pragma NO COVERAGE
         documentation for the ``search`` method of this class to
         understand paths, depths, and the ``include_path`` argument.
         """
-        if isinstance(query, (text_type, tuple, list)):
+        if isinstance(query, (basestring, tuple, list)):
             path = query
             depth = None
             include_path = False
@@ -372,7 +371,6 @@ class CatalogPathIndex2(CatalogIndex):  # pragma NO COVERAGE
     def applyEq(self, query):
         return self.apply(query)
 
-
 def add_to_closest(sofar, thispath, theset):
     paths = sorted(sofar.keys(), reverse=True)
     for path in paths:
@@ -380,7 +378,6 @@ def add_to_closest(sofar, thispath, theset):
         if thispath[:pathlen] == path:
             sofar[path][1].update(theset)
             break
-
 
 def remove_from_closest(sofar, thispath, docid):
     paths = sorted(sofar.keys(), reverse=True)
@@ -391,3 +388,4 @@ def remove_from_closest(sofar, thispath, docid):
             if docid in theset:
                 theset.remove(docid)
             break
+

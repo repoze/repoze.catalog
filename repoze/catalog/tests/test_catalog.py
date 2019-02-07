@@ -385,11 +385,10 @@ class DummyTransaction:
         self.committed = True
 
 from repoze.catalog.catalog import ICatalogIndex
-from zope.interface import implementer
+from zope.interface import implements
 
-
-@implementer(ICatalogIndex)
 class DummyIndex(object):
+    implements(ICatalogIndex)
 
     value = None
     docid = None

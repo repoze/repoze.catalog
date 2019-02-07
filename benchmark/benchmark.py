@@ -65,7 +65,7 @@ class TimedAction(object):
         self.end_time = time.time()
         
     def print_action(self,level=0):
-        indent = "  ".join( [ "" for i in range(level+1) ] ) # Hacky, sorry
+        indent = "  ".join( [ "" for i in xrange(level+1) ] ) # Hacky, sorry
         if self.end_time:
             print "%s%s: %0.3f" % ( indent, self.name,
                                     self.end_time - self.start_time )
