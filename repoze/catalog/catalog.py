@@ -2,14 +2,15 @@ import BTrees
 from persistent.mapping import PersistentMapping
 import transaction
 
-from zope.interface import implements
+from zope.interface import implementer
 
 from repoze.catalog.interfaces import ICatalog
 from repoze.catalog.interfaces import ICatalogIndex
+from repoze.catalog.compat import text_type
 
+
+@implementer(ICatalog)
 class Catalog(PersistentMapping):
-
-    implements(ICatalog)
 
     family = BTrees.family32
 
@@ -100,7 +101,7 @@ class Catalog(PersistentMapping):
             if not results:
                 return EMPTY_RESULT
 
-            results.sort() # order from smallest to largest
+            results.sort(key=lambda x: x[0])  # order from smallest to largest
             _, result = results.pop(0)
             for _, r in results:
                 _, result = self.family.IF.weightedIntersection(result, r)
@@ -145,9 +146,9 @@ class Catalog(PersistentMapping):
         (num, resultseq)."""
         try:
             from repoze.catalog.query import parse_query
-            if isinstance(queryobject, basestring):
+            if isinstance(queryobject, text_type):
                 queryobject = parse_query(queryobject)
-        except ImportError: #pragma NO COVERAGE
+        except ImportError:  # pragma NO COVERAGE
             pass
         results = queryobject._apply(self, names)
         return self.sort_result(results, sort_index, limit, sort_type, reverse)

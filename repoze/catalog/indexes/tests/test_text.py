@@ -1,4 +1,5 @@
 import unittest
+from repoze.catalog.compat import text_type
 
 _marker = object()
 
@@ -90,7 +91,7 @@ class TestCatalogTextIndex(unittest.TestCase):
 
     def test_applyDoesNotContain_with_unindexed_doc(self):
         def discriminator(obj, default):
-            if isinstance(obj, basestring):
+            if isinstance(obj, text_type):
                 return obj
             return default
         index = self._makeOne(discriminator)

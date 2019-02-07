@@ -198,11 +198,11 @@ class TestCatalogIndex(unittest.TestCase):
 
 
 from repoze.catalog.interfaces import ICatalogIndex
-from zope.interface import implements
+from zope.interface import implementer
 
 
+@implementer(ICatalogIndex)
 class DummyIndex(object):
-    implements(ICatalogIndex)
 
     value = None
 
