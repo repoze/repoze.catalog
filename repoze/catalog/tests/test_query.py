@@ -19,7 +19,7 @@ class TestQuery(unittest.TestCase):
         a = self._makeOne()
         b = self._makeOne()
         result = a & b
-        self.failUnless(isinstance(result, And))
+        self.assertTrue(isinstance(result, And))
         self.assertEqual(result.queries[0], a)
         self.assertEqual(result.queries[1], b)
 
@@ -32,7 +32,7 @@ class TestQuery(unittest.TestCase):
         a = self._makeOne()
         b = self._makeOne()
         result = a | b
-        self.failUnless(isinstance(result, Or))
+        self.assertTrue(isinstance(result, Or))
         self.assertEqual(result.queries[0], a)
         self.assertEqual(result.queries[1], b)
 
@@ -357,7 +357,7 @@ class TestAny(ComparatorTestBase):
         result = inst._apply(catalog, None)
         self.assertEqual(result, ('one', 'two'))
         self.assertEqual(catalog.index.any, ('one', 'two'))
-        
+
     def test_apply_with_names(self):
         from repoze.catalog.query import Name
         catalog = DummyCatalog()
@@ -573,8 +573,8 @@ class TestOr(BoolOpTestBase):
         o = self._makeOne(left, right)
         o.family = DummyFamily()
         self.assertEqual(o._apply(None, None), set([1, 2, 3, 4]))
-        self.failUnless(left.applied)
-        self.failUnless(right.applied)
+        self.assertTrue(left.applied)
+        self.assertTrue(right.applied)
         self.assertEqual(o.family.union, (left.results, right.results))
 
     def test_apply_left_empty(self):
@@ -583,8 +583,8 @@ class TestOr(BoolOpTestBase):
         o = self._makeOne(left, right)
         o.family = DummyFamily()
         self.assertEqual(o._apply(None, None), set([3, 4]))
-        self.failUnless(left.applied)
-        self.failUnless(right.applied)
+        self.assertTrue(left.applied)
+        self.assertTrue(right.applied)
         self.assertEqual(o.family.union, None)
 
     def test_apply_right_empty(self):
@@ -593,8 +593,8 @@ class TestOr(BoolOpTestBase):
         o = self._makeOne(left, right)
         o.family = DummyFamily()
         self.assertEqual(o._apply(None, None), set([1, 2]))
-        self.failUnless(left.applied)
-        self.failUnless(right.applied)
+        self.assertTrue(left.applied)
+        self.assertTrue(right.applied)
         self.assertEqual(o.family.union, None)
 
     def test_negate(self):
@@ -603,10 +603,10 @@ class TestOr(BoolOpTestBase):
         right = DummyQuery('bar')
         o = self._makeOne(left, right)
         neg = o.negate()
-        self.failUnless(isinstance(neg, And))
+        self.assertTrue(isinstance(neg, And))
         left, right = neg.queries
-        self.failUnless(left.negated)
-        self.failUnless(right.negated)
+        self.assertTrue(left.negated)
+        self.assertTrue(right.negated)
 
 
 class TestAnd(BoolOpTestBase):
@@ -625,8 +625,8 @@ class TestAnd(BoolOpTestBase):
         o = self._makeOne(left, right)
         o.family = DummyFamily()
         self.assertEqual(o._apply(None, None), set([3]))
-        self.failUnless(left.applied)
-        self.failUnless(right.applied)
+        self.assertTrue(left.applied)
+        self.assertTrue(right.applied)
         self.assertEqual(o.family.intersection, (left.results, right.results))
 
     def test_apply_left_empty(self):
@@ -635,8 +635,8 @@ class TestAnd(BoolOpTestBase):
         o = self._makeOne(left, right)
         o.family = DummyFamily()
         self.assertEqual(o._apply(None, None), set())
-        self.failUnless(left.applied)
-        self.failIf(right.applied)
+        self.assertTrue(left.applied)
+        self.assertFalse(right.applied)
         self.assertEqual(o.family.intersection, None)
 
     def test_apply_right_empty(self):
@@ -645,8 +645,8 @@ class TestAnd(BoolOpTestBase):
         o = self._makeOne(left, right)
         o.family = DummyFamily()
         self.assertEqual(o._apply(None, None), set())
-        self.failUnless(left.applied)
-        self.failUnless(right.applied)
+        self.assertTrue(left.applied)
+        self.assertTrue(right.applied)
         self.assertEqual(o.family.intersection, None)
 
     def test_negate(self):
@@ -655,10 +655,10 @@ class TestAnd(BoolOpTestBase):
         right = DummyQuery('bar')
         o = self._makeOne(left, right)
         neg = o.negate()
-        self.failUnless(isinstance(neg, Or))
+        self.assertTrue(isinstance(neg, Or))
         left, right = neg.queries
-        self.failUnless(left.negated)
-        self.failUnless(right.negated)
+        self.assertTrue(left.negated)
+        self.assertTrue(right.negated)
 
 
 class TestNot(BoolOpTestBase):
@@ -675,8 +675,8 @@ class TestNot(BoolOpTestBase):
         query = DummyQuery('foo')
         o = self._makeOne(query)
         self.assertEqual(o._apply(None, None), 'foo')
-        self.failUnless(query.negated)
-        self.failUnless(query.applied)
+        self.assertTrue(query.negated)
+        self.assertTrue(query.applied)
 
     def test_negate(self):
         query = DummyQuery('foo')
@@ -702,9 +702,9 @@ class TestName(unittest.TestCase):
     def test_eq(self):
         o1 = self._makeOne()
         o2 = self._makeOne()
-        self.failIf(o1 is o2)
-        self.failUnless(o1 == o2)
-        self.failIf(o1 == 'foo')
+        self.assertFalse(o1 is o2)
+        self.assertTrue(o1 == o2)
+        self.assertFalse(o1 == 'foo')
 
 
 class Test_parse_query(unittest.TestCase):
@@ -779,14 +779,14 @@ class Test_parse_query(unittest.TestCase):
     def test_eq(self):
         from repoze.catalog.query import Eq
         eq = self._call_fut('a.foo == 1')
-        self.failUnless(isinstance(eq, Eq))
+        self.assertTrue(isinstance(eq, Eq))
         self.assertEqual(eq.index_name, 'a.foo')
         self.assertEqual(eq._value, 1)
 
     def test_not_eq(self):
         from repoze.catalog.query import NotEq
         not_eq = self._call_fut("a != 'one'")
-        self.failUnless(isinstance(not_eq, NotEq))
+        self.assertTrue(isinstance(not_eq, NotEq))
         self.assertEqual(not_eq.index_name, 'a')
         self.assertEqual(not_eq._value, "one")
 
@@ -794,106 +794,106 @@ class Test_parse_query(unittest.TestCase):
         from repoze.catalog.query import Lt
         from repoze.catalog.query import Name
         lt = self._call_fut("a < foo")
-        self.failUnless(isinstance(lt, Lt))
+        self.assertTrue(isinstance(lt, Lt))
         self.assertEqual(lt.index_name, 'a')
         self.assertEqual(lt._value, Name('foo'))
 
     def test_le(self):
         from repoze.catalog.query import Le
         le = self._call_fut("a <= 4")
-        self.failUnless(isinstance(le, Le))
+        self.assertTrue(isinstance(le, Le))
         self.assertEqual(le.index_name, 'a')
         self.assertEqual(le._value, 4)
 
     def test_gt(self):
         from repoze.catalog.query import Gt
         gt = self._call_fut('b > 2')
-        self.failUnless(isinstance(gt, Gt))
+        self.assertTrue(isinstance(gt, Gt))
         self.assertEqual(gt.index_name, 'b')
         self.assertEqual(gt._value, 2)
 
     def test_ge(self):
         from repoze.catalog.query import Ge
         ge = self._call_fut("a >= 5")
-        self.failUnless(isinstance(ge, Ge))
+        self.assertTrue(isinstance(ge, Ge))
         self.assertEqual(ge.index_name, 'a')
         self.assertEqual(ge._value, 5)
 
     def test_contains(self):
         from repoze.catalog.query import Contains
         contains = self._call_fut("6 in a")
-        self.failUnless(isinstance(contains, Contains))
+        self.assertTrue(isinstance(contains, Contains))
         self.assertEqual(contains.index_name, 'a')
         self.assertEqual(contains._value, 6)
 
     def test_does_not_contain(self):
         from repoze.catalog.query import DoesNotContain
         contains = self._call_fut("6 not in a")
-        self.failUnless(isinstance(contains, DoesNotContain))
+        self.assertTrue(isinstance(contains, DoesNotContain))
         self.assertEqual(contains.index_name, 'a')
         self.assertEqual(contains._value, 6)
 
     def test_range_exclusive_exclusive(self):
         from repoze.catalog.query import InRange
         comp = self._call_fut("0 < a < 5")
-        self.failUnless(isinstance(comp, InRange))
+        self.assertTrue(isinstance(comp, InRange))
         self.assertEqual(comp.index_name, 'a')
         self.assertEqual(comp._start, 0)
         self.assertEqual(comp._end, 5)
-        self.failUnless(comp.start_exclusive)
-        self.failUnless(comp.end_exclusive)
+        self.assertTrue(comp.start_exclusive)
+        self.assertTrue(comp.end_exclusive)
 
     def test_range_exclusive_inclusive(self):
         from repoze.catalog.query import InRange
         comp = self._call_fut("0 < a <= 5")
-        self.failUnless(isinstance(comp, InRange))
+        self.assertTrue(isinstance(comp, InRange))
         self.assertEqual(comp.index_name, 'a')
         self.assertEqual(comp._start, 0)
         self.assertEqual(comp._end, 5)
-        self.failUnless(comp.start_exclusive)
-        self.failIf(comp.end_exclusive)
+        self.assertTrue(comp.start_exclusive)
+        self.assertFalse(comp.end_exclusive)
 
     def test_range_inclusive_exclusive(self):
         from repoze.catalog.query import InRange
         comp = self._call_fut("0 <= a < 5")
-        self.failUnless(isinstance(comp, InRange))
+        self.assertTrue(isinstance(comp, InRange))
         self.assertEqual(comp.index_name, 'a')
         self.assertEqual(comp._start, 0)
         self.assertEqual(comp._end, 5)
-        self.failIf(comp.start_exclusive)
-        self.failUnless(comp.end_exclusive)
+        self.assertFalse(comp.start_exclusive)
+        self.assertTrue(comp.end_exclusive)
 
     def test_range_inclusive_inclusive(self):
         from repoze.catalog.query import InRange
         comp = self._call_fut("0 <= a <= 5")
-        self.failUnless(isinstance(comp, InRange))
+        self.assertTrue(isinstance(comp, InRange))
         self.assertEqual(comp.index_name, 'a')
         self.assertEqual(comp._start, 0)
         self.assertEqual(comp._end, 5)
-        self.failIf(comp.start_exclusive)
-        self.failIf(comp.end_exclusive)
+        self.assertFalse(comp.start_exclusive)
+        self.assertFalse(comp.end_exclusive)
 
     def test_not_in_range(self):
         from repoze.catalog.query import NotInRange
         comp = self._call_fut("not(0 < a < 5)")
-        self.failUnless(isinstance(comp, NotInRange))
+        self.assertTrue(isinstance(comp, NotInRange))
         self.assertEqual(comp.index_name, 'a')
         self.assertEqual(comp._start, 0)
         self.assertEqual(comp._end, 5)
-        self.failUnless(comp.start_exclusive)
-        self.failUnless(comp.end_exclusive)
+        self.assertTrue(comp.start_exclusive)
+        self.assertTrue(comp.end_exclusive)
 
     def test_or(self):
         from repoze.catalog.query import Eq
         from repoze.catalog.query import Or
         op = self._call_fut("(a == 1) | (b == 2)")
-        self.failUnless(isinstance(op, Or))
+        self.assertTrue(isinstance(op, Or))
         query = op.queries[0]
-        self.failUnless(isinstance(query, Eq))
+        self.assertTrue(isinstance(query, Eq))
         self.assertEqual(query.index_name, 'a')
         self.assertEqual(query._value, 1)
         query = op.queries[1]
-        self.failUnless(isinstance(query, Eq))
+        self.assertTrue(isinstance(query, Eq))
         self.assertEqual(query.index_name, 'b')
         self.assertEqual(query._value, 2)
 
@@ -901,27 +901,27 @@ class Test_parse_query(unittest.TestCase):
         from repoze.catalog.query import NotEq
         from repoze.catalog.query import Or
         op = self._call_fut("a != 1 or b != 2")
-        self.failUnless(isinstance(op, Or))
+        self.assertTrue(isinstance(op, Or))
         query = op.queries[0]
-        self.failUnless(isinstance(query, NotEq))
+        self.assertTrue(isinstance(query, NotEq))
         self.assertEqual(query.index_name, 'a')
         self.assertEqual(query._value, 1)
         query = op.queries[1]
-        self.failUnless(isinstance(query, NotEq))
+        self.assertTrue(isinstance(query, NotEq))
         self.assertEqual(query.index_name, 'b')
         self.assertEqual(query._value, 2)
 
     def test_any(self):
         from repoze.catalog.query import Any
         op = self._call_fut("a == 1 or a == 2 or a == 3")
-        self.failUnless(isinstance(op, Any), op)
+        self.assertTrue(isinstance(op, Any), op)
         self.assertEqual(op.index_name, 'a')
         self.assertEqual(op._value, [1, 2, 3])
 
     def test_better_any(self):
         from repoze.catalog.query import Any
         op = self._call_fut("a in any([1, 2, 3])")
-        self.failUnless(isinstance(op, Any), op)
+        self.assertTrue(isinstance(op, Any), op)
         self.assertEqual(op.index_name, 'a')
         self.assertEqual(op._value, [1, 2, 3])
 
@@ -929,7 +929,7 @@ class Test_parse_query(unittest.TestCase):
         from repoze.catalog.query import Any
         from repoze.catalog.query import Name
         op = self._call_fut("a in any(foo)")
-        self.failUnless(isinstance(op, Any), op)
+        self.assertTrue(isinstance(op, Any), op)
         self.assertEqual(op.index_name, 'a')
         self.assertEqual(op._value, Name('foo'))
 
@@ -937,21 +937,21 @@ class Test_parse_query(unittest.TestCase):
         from repoze.catalog.query import Any
         from repoze.catalog.query import Name
         op = self._call_fut("a in any([foo, bar])")
-        self.failUnless(isinstance(op, Any), op)
+        self.assertTrue(isinstance(op, Any), op)
         self.assertEqual(op.index_name, 'a')
         self.assertEqual(op._value, [Name('foo'), Name('bar')])
 
     def test_not_any(self):
         from repoze.catalog.query import NotAny
         op = self._call_fut("not(a == 1 or a == 2 or a == 3)")
-        self.failUnless(isinstance(op, NotAny), op)
+        self.assertTrue(isinstance(op, NotAny), op)
         self.assertEqual(op.index_name, 'a')
         self.assertEqual(op._value, [1, 2, 3])
 
     def test_better_not_any(self):
         from repoze.catalog.query import NotAny
         op = self._call_fut("a not in any([1, 2, 3])")
-        self.failUnless(isinstance(op, NotAny), op)
+        self.assertTrue(isinstance(op, NotAny), op)
         self.assertEqual(op.index_name, 'a')
         self.assertEqual(op._value, [1, 2, 3])
 
@@ -959,13 +959,13 @@ class Test_parse_query(unittest.TestCase):
         from repoze.catalog.query import Eq
         from repoze.catalog.query import And
         op = self._call_fut("(a == 1) & (b == 2)")
-        self.failUnless(isinstance(op, And))
+        self.assertTrue(isinstance(op, And))
         query = op.queries[0]
-        self.failUnless(isinstance(query, Eq))
+        self.assertTrue(isinstance(query, Eq))
         self.assertEqual(query.index_name, 'a')
         self.assertEqual(query._value, 1)
         query = op.queries[1]
-        self.failUnless(isinstance(query, Eq))
+        self.assertTrue(isinstance(query, Eq))
         self.assertEqual(query.index_name, 'b')
         self.assertEqual(query._value, 2)
 
@@ -973,41 +973,41 @@ class Test_parse_query(unittest.TestCase):
         from repoze.catalog.query import Eq
         from repoze.catalog.query import And
         op = self._call_fut("a == 1 and b == 2")
-        self.failUnless(isinstance(op, And))
+        self.assertTrue(isinstance(op, And))
         query = op.queries[0]
-        self.failUnless(isinstance(query, Eq))
+        self.assertTrue(isinstance(query, Eq))
         self.assertEqual(query.index_name, 'a')
         self.assertEqual(query._value, 1)
         query = op.queries[1]
-        self.failUnless(isinstance(query, Eq))
+        self.assertTrue(isinstance(query, Eq))
         self.assertEqual(query.index_name, 'b')
         self.assertEqual(query._value, 2)
 
     def test_all(self):
         from repoze.catalog.query import All
         op = self._call_fut("a == 1 and a == 2 and a == 3")
-        self.failUnless(isinstance(op, All), op)
+        self.assertTrue(isinstance(op, All), op)
         self.assertEqual(op.index_name, 'a')
         self.assertEqual(op._value, [1, 2, 3])
 
     def test_better_all(self):
         from repoze.catalog.query import All
         op = self._call_fut("a in all([1, 2, 3])")
-        self.failUnless(isinstance(op, All), op)
+        self.assertTrue(isinstance(op, All), op)
         self.assertEqual(op.index_name, 'a')
         self.assertEqual(op._value, [1, 2, 3])
 
     def test_not_all(self):
         from repoze.catalog.query import NotAll
         op = self._call_fut("not(a == 1 and a == 2 and a == 3)")
-        self.failUnless(isinstance(op, NotAll), op)
+        self.assertTrue(isinstance(op, NotAll), op)
         self.assertEqual(op.index_name, 'a')
         self.assertEqual(op._value, [1, 2, 3])
 
     def test_better_not_all(self):
         from repoze.catalog.query import NotAll
         op = self._call_fut("a not in all([1, 2, 3])")
-        self.failUnless(isinstance(op, NotAll), op)
+        self.assertTrue(isinstance(op, NotAll), op)
         self.assertEqual(op.index_name, 'a')
         self.assertEqual(op._value, [1, 2, 3])
 
@@ -1020,16 +1020,16 @@ class Test_parse_query(unittest.TestCase):
         from repoze.catalog.query import Eq
         from repoze.catalog.query import Or
         op = self._call_fut("a == 1 or a == 2 and a == 3")
-        self.failUnless(isinstance(op, Or))
-        self.failUnless(isinstance(op.queries[0], Eq))
-        self.failUnless(isinstance(op.queries[1], All))
+        self.assertTrue(isinstance(op, Or))
+        self.assertTrue(isinstance(op.queries[0], Eq))
+        self.assertTrue(isinstance(op.queries[1], All))
         self.assertEqual(op.queries[1].index_name, 'a')
         self.assertEqual(op.queries[1]._value, [2, 3])
 
     def test_convert_gtlt_to_range(self):
         from repoze.catalog.query import InRange
         op = self._call_fut("a < 1 and a > 0")
-        self.failUnless(isinstance(op, InRange))
+        self.assertTrue(isinstance(op, InRange))
         self.assertEqual(op._start, 0)
         self.assertEqual(op._end, 1)
         self.assertEqual(op.start_exclusive, True)
@@ -1038,7 +1038,7 @@ class Test_parse_query(unittest.TestCase):
     def test_convert_ltgt_to_range(self):
         from repoze.catalog.query import InRange
         op = self._call_fut("a > 0 and a < 1")
-        self.failUnless(isinstance(op, InRange))
+        self.assertTrue(isinstance(op, InRange))
         self.assertEqual(op._start, 0)
         self.assertEqual(op._end, 1)
         self.assertEqual(op.start_exclusive, True)
@@ -1047,7 +1047,7 @@ class Test_parse_query(unittest.TestCase):
     def test_convert_gtlt_to_not_in_range(self):
         from repoze.catalog.query import NotInRange
         op = self._call_fut("a < 0 or a > 1")
-        self.failUnless(isinstance(op, NotInRange))
+        self.assertTrue(isinstance(op, NotInRange))
         self.assertEqual(op._start, 0)
         self.assertEqual(op._end, 1)
         self.assertEqual(op.start_exclusive, False)
@@ -1056,7 +1056,7 @@ class Test_parse_query(unittest.TestCase):
     def test_convert_ltgt_to_not_in_range(self):
         from repoze.catalog.query import NotInRange
         op = self._call_fut("a > 1 or a < 0")
-        self.failUnless(isinstance(op, NotInRange))
+        self.assertTrue(isinstance(op, NotInRange))
         self.assertEqual(op._start, 0)
         self.assertEqual(op._end, 1)
         self.assertEqual(op.start_exclusive, False)
@@ -1067,18 +1067,18 @@ class Test_parse_query(unittest.TestCase):
         from repoze.catalog.query import And
         from repoze.catalog.query import InRange
         op = self._call_fut("a > 0 and (a < 5 and b == 7)")
-        self.failUnless(isinstance(op, And))
-        self.failUnless(isinstance(op.queries[0], InRange))
-        self.failUnless(isinstance(op.queries[1], Eq))
+        self.assertTrue(isinstance(op, And))
+        self.assertTrue(isinstance(op.queries[0], InRange))
+        self.assertTrue(isinstance(op.queries[1], Eq))
 
     def test_strange_gtlt_child_left_nephew_right(self):
         from repoze.catalog.query import Eq
         from repoze.catalog.query import And
         from repoze.catalog.query import InRange
         op = self._call_fut("a > 0 and (b == 7 and a < 5)")
-        self.failUnless(isinstance(op, And))
-        self.failUnless(isinstance(op.queries[0], InRange))
-        self.failUnless(isinstance(op.queries[1], Eq))
+        self.assertTrue(isinstance(op, And))
+        self.assertTrue(isinstance(op.queries[0], InRange))
+        self.assertTrue(isinstance(op.queries[1], Eq))
 
     def test_convert_gtlt_child_right_nephew_left(self):
         from repoze.catalog.query import Eq
@@ -1086,10 +1086,10 @@ class Test_parse_query(unittest.TestCase):
         from repoze.catalog.query import And
         from repoze.catalog.query import InRange
         op = self._call_fut("a >= 0 and b == 2 and c > 3 and a <= 1")
-        self.failUnless(isinstance(op, And))
-        self.failUnless(isinstance(op.queries[0], InRange))
-        self.failUnless(isinstance(op.queries[1], Eq))
-        self.failUnless(isinstance(op.queries[2], Gt))
+        self.assertTrue(isinstance(op, And))
+        self.assertTrue(isinstance(op.queries[0], InRange))
+        self.assertTrue(isinstance(op.queries[1], Eq))
+        self.assertTrue(isinstance(op.queries[2], Gt))
 
     def test_convert_gtlt_both_descendants(self):
         from repoze.catalog.query import Eq
@@ -1097,20 +1097,20 @@ class Test_parse_query(unittest.TestCase):
         from repoze.catalog.query import And
         from repoze.catalog.query import InRange
         op = self._call_fut("b == 2 and a > 0 and (a <= 1 and c > 3)")
-        self.failUnless(isinstance(op, And))
-        self.failUnless(isinstance(op.queries[0], Eq))
-        self.failUnless(isinstance(op.queries[1], InRange))
-        self.failUnless(isinstance(op.queries[2], Gt))
+        self.assertTrue(isinstance(op, And))
+        self.assertTrue(isinstance(op.queries[0], Eq))
+        self.assertTrue(isinstance(op.queries[1], InRange))
+        self.assertTrue(isinstance(op.queries[2], Gt))
 
     def test_convert_gtlt_both_descendants_multiple_times(self):
         from repoze.catalog.query import And
         from repoze.catalog.query import InRange
         op = self._call_fut(
             "(a > 0 and b > 0 and c > 0) and (a < 5 and b < 5 and c < 5)")
-        self.failUnless(isinstance(op, And))
-        self.failUnless(isinstance(op.queries[0], InRange))
-        self.failUnless(isinstance(op.queries[1], InRange))
-        self.failUnless(isinstance(op.queries[2], InRange))
+        self.assertTrue(isinstance(op, And))
+        self.assertTrue(isinstance(op.queries[0], InRange))
+        self.assertTrue(isinstance(op.queries[1], InRange))
+        self.assertTrue(isinstance(op.queries[2], InRange))
 
     def test_dont_convert_gtlt_to_range_with_or_spread_out(self):
         from repoze.catalog.query import Gt
@@ -1118,13 +1118,13 @@ class Test_parse_query(unittest.TestCase):
         from repoze.catalog.query import And
         from repoze.catalog.query import Or
         op = self._call_fut("a > 0 and b > 0 or a < 5 and b < 5")
-        self.failUnless(isinstance(op, Or))
-        self.failUnless(isinstance(op.queries[0], And))
-        self.failUnless(isinstance(op.queries[0].queries[0], Gt))
-        self.failUnless(isinstance(op.queries[0].queries[1], Gt))
-        self.failUnless(isinstance(op.queries[1], And))
-        self.failUnless(isinstance(op.queries[1].queries[0], Lt))
-        self.failUnless(isinstance(op.queries[1].queries[1], Lt))
+        self.assertTrue(isinstance(op, Or))
+        self.assertTrue(isinstance(op.queries[0], And))
+        self.assertTrue(isinstance(op.queries[0].queries[0], Gt))
+        self.assertTrue(isinstance(op.queries[0].queries[1], Gt))
+        self.assertTrue(isinstance(op.queries[1], And))
+        self.assertTrue(isinstance(op.queries[1].queries[0], Lt))
+        self.assertTrue(isinstance(op.queries[1].queries[1], Lt))
 
 
 if not ast_support:  # pragma NO COVERAGE

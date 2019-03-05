@@ -29,12 +29,12 @@ class TestCatalog(unittest.TestCase):
     def test_ctor_defaults(self):
         from BTrees import family32
         catalog = self._makeOne()
-        self.failUnless(catalog.family is family32)
+        self.assertTrue(catalog.family is family32)
 
     def test_ctor_explicit_family(self):
         from BTrees import family64
         catalog = self._makeOne(family64)
-        self.failUnless(catalog.family is family64)
+        self.assertTrue(catalog.family is family64)
 
     def test_clear(self):
         catalog = self._makeOne()
@@ -295,14 +295,14 @@ class TestFileStorageCatalogFactory(unittest.TestCase):
         factory = self._makeOne(self.tempfile, 'catalog')
         from repoze.catalog.catalog import Catalog
         catalog = factory()
-        self.failUnless(isinstance(catalog, Catalog))
+        self.assertTrue(isinstance(catalog, Catalog))
         factory.db.close()
 
     def test_with_cache_size(self):
         factory = self._makeOne(self.tempfile, 'catalog', cache_size=1000)
         from repoze.catalog.catalog import Catalog
         catalog = factory()
-        self.failUnless(isinstance(catalog, Catalog))
+        self.assertTrue(isinstance(catalog, Catalog))
         self.assertEqual(factory.db._cache_size, 1000)
         factory.db.close()
 
@@ -313,7 +313,7 @@ class TestFileStorageCatalogFactory(unittest.TestCase):
         def handle(conn):
             e['conn'] = conn
         catalog = factory(handle)
-        self.failUnless(isinstance(catalog, Catalog))
+        self.assertTrue(isinstance(catalog, Catalog))
         self.assertEqual(e['conn']._db, factory.db)
         factory.db.close()
 
