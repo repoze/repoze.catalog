@@ -1,9 +1,20 @@
 language: python
 sudo : false
 
-env:
-  - TOXENV=py27
-  - TOXENV=cover
+matrix:
+    include:
+        - python: 2.7
+          env: TOXENV=py27
+        - python: 3.6
+          env: TOXENV=py36
+        - python: 3.6
+          env: TOXENV=py36-cover,coverage
+        - python: 3.6
+          env: TOXENV=lint
+        - python: 3.7
+          env: TOXENV=py37
+          dist: xenial
+          sudo: true
 
 install:
   - travis_retry pip install tox
