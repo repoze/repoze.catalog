@@ -64,6 +64,9 @@ class CatalogPathIndex2(CatalogIndex):  # pragma NO COVERAGE
     def __nonzero__(self):
         return True
 
+    def __bool__(self):
+        return True
+
     def _getPathTuple(self, path):
         if not path:
             raise ValueError('path must be nonempty (not %s)' % str(path))
