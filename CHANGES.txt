@@ -7,8 +7,8 @@
 
 - Python 3 compatible
 
-- Add support for Python 3.4 - 3.7
-  [vangheem]
+- Add support for Python 3.6 - 3.7
+  [vangheem, agitator, jensens]
 
 0.8.3 (2014-08-07)
 ==================
