@@ -1,4 +1,5 @@
 import unittest
+from six.moves import range
 
 _marker = object()
 
@@ -197,28 +198,28 @@ class PathIndexTests(unittest.TestCase):
 
     def test_searches_against_root_plain_string(self):
         index = self._makeOne(VALUES)
-        expected = range(1,19)
+        expected = list(range(1,19))
 
         results = list(index.apply('/').keys())
         self.assertEqual(results, expected)
 
     def test_searches_against_root_tuple(self):
         index = self._makeOne(VALUES)
-        expected = range(1,19)
+        expected = list(range(1,19))
 
         results = list(index.apply(('',)).keys())
         self.assertEqual(results, expected)
 
     def test_searches_against_root_list(self):
         index = self._makeOne(VALUES)
-        expected = range(1,19)
+        expected = list(range(1,19))
 
         results = list(index.apply(['']).keys())
         self.assertEqual(results, expected)
 
     def test_searches_against_root_wo_level(self):
         index = self._makeOne(VALUES)
-        expected = range(1,19)
+        expected = list(range(1,19))
 
         results = list(index.apply({'query': '/'}).keys())
         self.assertEqual(results, expected)
@@ -227,7 +228,7 @@ class PathIndexTests(unittest.TestCase):
         index = self._makeOne(VALUES)
         comp = "/"
         level = 0
-        expected = range(1,19)
+        expected = list(range(1,19))
 
         results = list(index.apply({'query': '/', 'level': 0}).keys())
         self.assertEqual(results, expected)
@@ -489,14 +490,14 @@ class PathIndexTests(unittest.TestCase):
 
     def test_applyEq(self):
         index = self._makeOne(VALUES)
-        expected = range(1,19)
+        expected = list(range(1,19))
 
         results = list(index.applyEq('/').keys())
         self.assertEqual(results, expected)
 
     def test_applyNotEq(self):
         index = self._makeOne(VALUES)
-        expected = range(1,10)
+        expected = list(range(1,10))
 
         results = list(index.applyNotEq('/bb').keys())
         self.assertEqual(results, expected)

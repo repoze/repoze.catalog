@@ -38,7 +38,7 @@ class CatalogTextIndex(CatalogIndex, TextIndex):
         return self.index_doc(docid, object)
 
     def _indexed(self):
-        return self.index._docwords.keys()
+        return list(self.index._docwords.keys())
 
     def sort(self, result, reverse=False, limit=None, sort_type=None):
         """Sort by text relevance.

@@ -5,6 +5,7 @@ import BTrees
 from repoze.catalog.interfaces import ICatalogIndex
 from repoze.catalog.indexes.common import CatalogIndex
 from repoze.catalog.compat import text_type
+from six.moves import range
 
 _marker = object()
 
@@ -189,7 +190,7 @@ class CatalogPathIndex2(CatalogIndex):  # pragma NO COVERAGE
             return False
 
     def _indexed(self):
-        return self.docid_to_path.keys()
+        return list(self.docid_to_path.keys())
 
     def search(self, path, depth=None, include_path=False, attr_checker=None):
         """ Provided a path string (e.g. ``/path/to/object``) or a
@@ -335,7 +336,7 @@ class CatalogPathIndex2(CatalogIndex):  # pragma NO COVERAGE
                         continue
                     stack.append((newpath, attrs[:]))
 
-        return attr_checker(result.values())
+        return attr_checker(list(result.values()))
 
     def apply_intersect(self, query, docids):
         """ Default apply_intersect implementation """
@@ -374,7 +375,7 @@ class CatalogPathIndex2(CatalogIndex):  # pragma NO COVERAGE
 
 
 def add_to_closest(sofar, thispath, theset):
-    paths = sorted(sofar.keys(), reverse=True)
+    paths = sorted(list(sofar.keys()), reverse=True)
     for path in paths:
         pathlen = len(path)
         if thispath[:pathlen] == path:
@@ -383,7 +384,7 @@ def add_to_closest(sofar, thispath, theset):
 
 
 def remove_from_closest(sofar, thispath, docid):
-    paths = sorted(sofar.keys(), reverse=True)
+    paths = sorted(list(sofar.keys()), reverse=True)
     for path in paths:
         pathlen = len(path)
         if thispath[:pathlen] == path:

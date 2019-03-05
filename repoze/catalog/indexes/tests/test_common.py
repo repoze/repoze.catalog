@@ -23,7 +23,7 @@ class TestCatalogIndex(unittest.TestCase):
             pass
         index = Test(_discriminator)
         index._docids = set()
-        self.failUnless(index.discriminator is _discriminator)
+        self.asseRttrue(index.discriminator is _discriminator)
 
     def test_ctor_string(self):
         klass = self._getTargetClass()
@@ -111,10 +111,10 @@ class TestCatalogIndex(unittest.TestCase):
             pass
         dummy = Dummy()
         self.assertEqual(index.index_doc(20, dummy), None)
-        self.failUnless(20 in index.docids())
+        self.asseRttrue(20 in index.docids())
         dummy.abc = 'foo'
         self.assertEqual(index.index_doc(20, dummy), 'foo')
-        self.failUnless(20 in index.docids())
+        self.asseRttrue(20 in index.docids())
 
     def test_index_doc_missing_value_then_unindex(self):
         klass = self._getTargetClass()
@@ -126,7 +126,7 @@ class TestCatalogIndex(unittest.TestCase):
             pass
         dummy = Dummy()
         self.assertEqual(index.index_doc(20, dummy), None)
-        self.failUnless(20 in index.docids())
+        self.asseRttrue(20 in index.docids())
         index.unindex_doc(20)
         self.failIf(20 in index.docids())
 

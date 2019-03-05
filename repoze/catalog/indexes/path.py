@@ -8,6 +8,7 @@ from BTrees.Length import Length
 from repoze.catalog.interfaces import ICatalogIndex
 from repoze.catalog.indexes.common import CatalogIndex
 from repoze.catalog.compat import text_type
+from six.moves import range
 
 _marker = ()
 
@@ -101,13 +102,13 @@ class CatalogPathIndex(CatalogIndex):
         if isinstance(path, (list, tuple)):
             path = '/' + '/'.join(path[1:])
 
-        comps = filter(None, path.split('/'))
+        comps = [_f for _f in path.split('/') if _f]
 
         if docid not in self._unindex:
             self._length.change(1)
 
-        for i in range(len(comps)):
-            self.insertEntry(comps[i], docid, i)
+        for idx, comp in enumerate(comps):
+            self.insertEntry(comp, docid, idx)
 
         self._unindex[docid] = path
         return 1
@@ -123,7 +124,7 @@ class CatalogPathIndex(CatalogIndex):
         comps = self._unindex[docid].split('/')
 
         for level in range(len(comps[1:])):
-            comp = comps[level+1]
+            comp = comps[level + 1]
 
             try:
                 self._index[comp][level].remove(docid)
@@ -140,7 +141,7 @@ class CatalogPathIndex(CatalogIndex):
         del self._unindex[docid]
 
     def _indexed(self):
-        return self._unindex.keys()
+        return list(self._unindex.keys())
 
     def search(self, path, default_level=0):
         """
@@ -157,10 +158,10 @@ class CatalogPathIndex(CatalogIndex):
             level = int(path[1])
             path = path[0]
 
-        comps = filter(None, path.split('/'))
+        comps = [_f for _f in path.split('/') if _f]
 
         if len(comps) == 0:
-            return self.family.IF.Set(self._unindex.keys())
+            return self.family.IF.Set(list(self._unindex.keys()))
 
         results = None
         if level >= 0:
@@ -221,8 +222,7 @@ class CatalogPathIndex(CatalogIndex):
 
         else:
             rs = None
-            sets.sort(lambda a, b: (len(a) > len(b)) - (len(a) < len(b)))
-            for set in sets:
+            for set in sorted(sets, key=lambda x: len(x)):
                 rs = self.family.IF.intersection(rs, set)
                 if not rs:
                     break

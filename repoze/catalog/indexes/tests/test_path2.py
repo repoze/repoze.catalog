@@ -132,7 +132,7 @@ class CatalogPathIndex2Tests(unittest.TestCase):
         index = self._makeOne(VALUES)
         # randomize the order
         import random
-        random.shuffle(docids)
+        random.shuffle(list(docids))
         for doc_id in docids:
             index.unindex_doc(doc_id)
 
@@ -429,7 +429,7 @@ class CatalogPathIndex2Tests(unittest.TestCase):
         index = self._makeOne(VALUES, attr_discriminator='attr')
         # randomize the order
         import random
-        random.shuffle(docids)
+        random.shuffle(list(docids))
         for doc_id in docids:
             index.unindex_doc(doc_id)
 

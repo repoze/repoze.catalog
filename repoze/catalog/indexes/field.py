@@ -93,7 +93,7 @@ class CatalogFieldIndex(CatalogIndex, FieldIndex):
         self._num_docs.change(-1)
 
     def _indexed(self):
-        return self._rev_index.keys()
+        return list(self._rev_index.keys())
 
     def sort(self, docids, reverse=False, limit=None, sort_type=None):
         if not docids:
@@ -219,19 +219,19 @@ class CatalogFieldIndex(CatalogIndex, FieldIndex):
     def _timsort(self, docids, limit=None, reverse=False):
         n = 0
         marker = _marker
-        _missing = []
 
-        def get(k, rev_index=self._rev_index, marker=marker):
-            v = rev_index.get(k, marker)
-            if v is marker:
-                _missing.append(k)
-            return v
+        def not_marker(docid):
+            return self._rev_index.get(docid, marker) is not marker
 
-        for docid in sorted(docids, key=get, reverse=reverse):
-            if docid in _missing:
-                # skip docids not in this index
-                continue
-            n += 1
+        for docid in islice(
+            sorted(
+                filter(not_marker, docids),
+                key=self._rev_index.get,
+                reverse=reverse,
+            ),
+            0,
+            limit,
+        ):
             yield docid
             if limit and n >= limit:
                 raise StopIteration
@@ -251,8 +251,7 @@ class CatalogFieldIndex(CatalogIndex, FieldIndex):
         if len(sets) == 1:
             result = sets[0]
         elif operator == 'and':
-            sets.sort()
-            for set in sets:
+            for set in sorted(sets, key=lambda x: len(x)):
                 result = self.family.IF.intersection(set, result)
         else:
             result = self.family.IF.multiunion(sets)

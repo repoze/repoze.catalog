@@ -22,7 +22,7 @@ IF = BTrees.family32.IF
 
 
 def migrate_to_0_8_0_from_document_map(catalog, document_map):
-    migrate_to_0_8_0_from_docids(catalog, document_map.docid_to_address.keys())
+    migrate_to_0_8_0_from_docids(catalog, list(document_map.docid_to_address.keys()))
 
 
 def migrate_to_0_8_0(catalog):

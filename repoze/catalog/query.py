@@ -1,5 +1,7 @@
+from __future__ import print_function
 import BTrees
 import sys
+from six.moves import range
 
 try:
     import ast
@@ -513,7 +515,7 @@ class Or(BoolOp):
                 else:
                     uppers[query.index_name] = (i, query)
 
-        queries = list(filter(None, queries))
+        queries = list([_f for _f in queries if _f])
         if len(queries) == 1:
             return queries[0]
 
@@ -576,7 +578,7 @@ class And(BoolOp):
                 else:
                     uppers[query.index_name] = (i, query)
 
-        queries = list(filter(None, queries))
+        queries = list([_f for _f in queries if _f])
         if len(queries) == 1:
             return queries[0]
 
@@ -934,7 +936,7 @@ def _print_ast(expr):  # pragma NO COVERAGE
     tree = ast.parse(expr)
 
     def visit(node, level):
-        print('  ' * level + str(node))
+        print(('  ' * level + str(node)))
         for child in ast.iter_child_nodes(node):
             visit(child, level + 1)
     visit(tree, 0)
