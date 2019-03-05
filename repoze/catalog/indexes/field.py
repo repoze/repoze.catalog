@@ -1,6 +1,6 @@
 import bisect
 import heapq
-from itertools import islice
+import itertools
 
 from zope.interface import implementer
 
@@ -151,7 +151,7 @@ class CatalogFieldIndex(CatalogIndex, FieldIndex):
             # XXX this needs work.
             rlen = len(docids)
             if limit:
-                if (limit < 300) or (limit/float(rlen) > 0.09):
+                if (limit < 300) or (limit / float(rlen) > 0.09):
                     sort_type = NBEST
                 else:
                     sort_type = TIMSORT
@@ -168,16 +168,17 @@ class CatalogFieldIndex(CatalogIndex, FieldIndex):
             raise ValueError('Unknown sort type %s' % sort_type)
 
     def scan_forward(self, docids, limit=None):
-        fwd_index = self._fwd_index
+        def in_docids(value):
+            return value in docids
 
-        n = 0
-        for set in fwd_index.values():
-            for docid in set:
-                if docid in docids:
-                    n += 1
-                    yield docid
-                    if limit and n >= limit:
-                        raise StopIteration
+        return itertools.islice(
+            filter(
+                in_docids, itertools.chain.from_iterable(
+                    self._fwd_index.values()
+                )
+            ),
+            limit,
+        )
 
     def nbest_ascending(self, docids, limit):
         if limit is None:  # pragma NO COVERAGE
@@ -187,7 +188,7 @@ class CatalogFieldIndex(CatalogIndex, FieldIndex):
 
         h = nsort(docids, self._rev_index)
         it = iter(h)
-        result = sorted(islice(it, 0, limit))
+        result = sorted(itertools.islice(it, 0, limit))
         if not result:  # pragma NO COVERAGE
             raise StopIteration
         insort = bisect.insort
@@ -223,7 +224,7 @@ class CatalogFieldIndex(CatalogIndex, FieldIndex):
         def not_marker(docid):
             return self._rev_index.get(docid, marker) is not marker
 
-        for docid in islice(
+        for docid in itertools.islice(
             sorted(
                 filter(not_marker, docids),
                 key=self._rev_index.get,
