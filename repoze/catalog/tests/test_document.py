@@ -107,7 +107,7 @@ class TestDocumentMap(unittest.TestCase):
         self.assertEqual(result, True)
         self.assertEqual(map.address_for_docid(1), None)
         self.assertEqual(map.docid_for_address('/address1'), None)
-        self.failIf(1 in map.docid_to_metadata)
+        self.assertFalse(1 in map.docid_to_metadata)
 
     def test_remove_address_map_out_of_sync(self):
         map = self._makeOne()
@@ -139,7 +139,7 @@ class TestDocumentMap(unittest.TestCase):
         map = self._makeOne()
         docid = map.add('/address1')
         map.add_metadata(docid, {})
-        self.failIf(docid in map.docid_to_metadata)
+        self.assertFalse(docid in map.docid_to_metadata)
 
     def test_remove_metadata_nokeys_nodocid(self):
         map = self._makeOne()
@@ -150,7 +150,7 @@ class TestDocumentMap(unittest.TestCase):
         docid = map.add('/address1')
         map.docid_to_metadata[docid] = None
         map.remove_metadata(docid)
-        self.failIf(docid in map.docid_to_metadata)
+        self.assertFalse(docid in map.docid_to_metadata)
 
     def test_remove_metadata_keys_nodocid(self):
         map = self._makeOne()
@@ -163,7 +163,7 @@ class TestDocumentMap(unittest.TestCase):
         map.remove_metadata(docid, 'a', 'b')
         self.assertEqual(map.get_metadata(docid), {'c':3})
         map.remove_metadata(docid, 'c')
-        self.failIf(docid in map.docid_to_metadata)
+        self.assertFalse(docid in map.docid_to_metadata)
 
     def test_get_metadata_no_mainbtree(self):
         map = self._makeOne()
@@ -195,5 +195,5 @@ class TestDocumentMap(unittest.TestCase):
         map = self._makeOne()
         map.docid_to_metadata = None
         map._check_metadata()
-        self.failIf(map.docid_to_metadata is None)
+        self.assertFalse(map.docid_to_metadata is None)
         self.assertEqual(dict(map.docid_to_metadata), {})

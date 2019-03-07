@@ -36,7 +36,7 @@ class TestCatalogKeywordIndex(unittest.TestCase):
             """ """
 
         index = self._makeOne(_discriminator)
-        self.failUnless(index.discriminator is _discriminator)
+        self.assertTrue(index.discriminator is _discriminator)
 
     def test_ctor_string_discriminator(self):
         index = self._makeOne('abc')
@@ -57,11 +57,11 @@ class TestCatalogKeywordIndex(unittest.TestCase):
         self.assertEqual(index.documentCount(), 1)
         index.reindex_doc(1, [1, 2, 3])
         self.assertEqual(index.documentCount(), 1)
-        self.failUnless(1 in index._rev_index)
-        self.failUnless(1 in index._fwd_index[1])
-        self.failUnless(1 in index._fwd_index[2])
-        self.failUnless(1 in index._fwd_index[3])
-        self.failIf(4 in index._fwd_index)
+        self.assertTrue(1 in index._rev_index)
+        self.assertTrue(1 in index._fwd_index[1])
+        self.assertTrue(1 in index._fwd_index[2])
+        self.assertTrue(1 in index._fwd_index[3])
+        self.assertFalse(4 in index._fwd_index)
 
     def test_reindex_doc_different_values(self):
         index = self._makeOne()
@@ -69,11 +69,11 @@ class TestCatalogKeywordIndex(unittest.TestCase):
         self.assertEqual(index.documentCount(), 1)
         index.reindex_doc(1, [2, 3, 4])
         self.assertEqual(index.documentCount(), 1)
-        self.failUnless(1 in index._rev_index)
-        self.failIf(1 in index._fwd_index.get(1, []))
-        self.failUnless(1 in index._fwd_index[2])
-        self.failUnless(1 in index._fwd_index[3])
-        self.failUnless(1 in index._fwd_index[4])
+        self.assertTrue(1 in index._rev_index)
+        self.assertFalse(1 in index._fwd_index.get(1, []))
+        self.assertTrue(1 in index._fwd_index[2])
+        self.assertTrue(1 in index._fwd_index[3])
+        self.assertTrue(1 in index._fwd_index[4])
 
     def test_apply_doesnt_mutate_query(self):
         # Some previous version of zope.index munged the query dict
@@ -192,36 +192,36 @@ class TestCatalogKeywordIndex(unittest.TestCase):
     def test_unindex_doc_removes_from_docids(self):
         index = self._makeOne()
         index.index_doc(20, [1, 2, 3])
-        self.failUnless(20 in index.docids())
+        self.assertTrue(20 in index.docids())
         index.unindex_doc(20)
-        self.failIf(20 in index.docids())
+        self.assertFalse(20 in index.docids())
 
     def test_index_doc_then_missing_value(self):
         index = self._makeOne()
         index.index_doc(20, [1, 2, 3])
         self.assertEqual(set([20]), set(index.applyEq(2)))
-        self.failUnless(20 in index.docids())
+        self.assertTrue(20 in index.docids())
         index.index_doc(20, _marker)
         self.assertEqual(set(), set(index.applyEq(2)))
-        self.failUnless(20 in index.docids())
+        self.assertTrue(20 in index.docids())
 
     def test_index_doc_missing_value_then_with_value(self):
         index = self._makeOne()
         index.index_doc(3, _marker)
         self.assertEqual(set(), set(index.applyEq(4)))
-        self.failUnless(3 in index.docids())
+        self.assertTrue(3 in index.docids())
         index.index_doc(3, [3, 4, 5])
         self.assertEqual(set([3]), set(index.applyEq(4)))
-        self.failUnless(3 in index.docids())
+        self.assertTrue(3 in index.docids())
 
     def test_index_doc_missing_value_then_unindex(self):
         index = self._makeOne()
         index.index_doc(3, _marker)
         self.assertEqual(set(), set(index.applyEq(4)))
-        self.failUnless(3 in index.docids())
+        self.assertTrue(3 in index.docids())
         index.unindex_doc(3)
         self.assertEqual(set(), set(index.applyEq(4)))
-        self.failIf(3 in index.docids())
+        self.assertFalse(3 in index.docids())
 
     def test_docids_with_indexed_and_not_indexed(self):
         index = self._makeOne()

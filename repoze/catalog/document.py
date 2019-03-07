@@ -179,7 +179,7 @@ class DocumentMap(Persistent):
         """
         if not docid in self.docid_to_address:
             raise KeyError(docid)
-        if len(data.keys()) == 0:
+        if len(list(data.keys())) == 0:
             return
         self._check_metadata()
         meta = self.docid_to_metadata.setdefault(docid, OOBTree())

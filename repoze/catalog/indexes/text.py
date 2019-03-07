@@ -1,11 +1,14 @@
-from zope.interface import implements
+from zope.interface import implementer
 
 from zope.index.interfaces import IIndexSort
 from zope.index.text import TextIndex
 
 from repoze.catalog.interfaces import ICatalogIndex
 from repoze.catalog.indexes.common import CatalogIndex
+from repoze.catalog.compat import text_type
 
+
+@implementer(ICatalogIndex, IIndexSort)
 class CatalogTextIndex(CatalogIndex, TextIndex):
     """ Full-text index.
 
@@ -20,11 +23,9 @@ class CatalogTextIndex(CatalogIndex, TextIndex):
     - NotEq
     """
 
-    implements(ICatalogIndex, IIndexSort)
-
     def __init__(self, discriminator, lexicon=None, index=None):
         if not callable(discriminator):
-            if not isinstance(discriminator, basestring):
+            if not isinstance(discriminator, text_type):
                 raise ValueError('discriminator value must be callable or a '
                                  'string')
         self.discriminator = discriminator
@@ -37,7 +38,7 @@ class CatalogTextIndex(CatalogIndex, TextIndex):
         return self.index_doc(docid, object)
 
     def _indexed(self):
-        return self.index._docwords.keys()
+        return list(self.index._docwords.keys())
 
     def sort(self, result, reverse=False, limit=None, sort_type=None):
         """Sort by text relevance.

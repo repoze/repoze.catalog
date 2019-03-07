@@ -1,11 +1,13 @@
-from zope.interface import implements
+from zope.interface import implementer
 
 from zope.index.keyword import KeywordIndex
 
 from repoze.catalog.interfaces import ICatalogIndex
 from repoze.catalog.indexes.common import CatalogIndex
+from repoze.catalog.compat import text_type
 
 
+@implementer(ICatalogIndex)
 class CatalogKeywordIndex(CatalogIndex, KeywordIndex):
     """
     Keyword index.
@@ -29,11 +31,10 @@ class CatalogKeywordIndex(CatalogIndex, KeywordIndex):
     - NotAll
 
     """
-    implements(ICatalogIndex)
 
     def __init__(self, discriminator):
         if not callable(discriminator):
-            if not isinstance(discriminator, basestring):
+            if not isinstance(discriminator, text_type):
                 raise ValueError('discriminator value must be callable or a '
                                  'string')
         self.discriminator = discriminator
@@ -45,7 +46,7 @@ class CatalogKeywordIndex(CatalogIndex, KeywordIndex):
         return self.index_doc(docid, value)
 
     def _indexed(self):
-        return self._rev_index.keys()
+        return list(self._rev_index.keys())
 
     def applyAny(self, values):
         return self.apply({'query': values, 'operator': 'or'})

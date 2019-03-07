@@ -55,7 +55,7 @@ class FieldIndexForwardSort:
             ('fwscan', self.index.scan_forward),
             ('timsort', self.index.timsort_ascending)
             )
- 
+
     def get_index(self):
         if not os.path.exists(self.dbfn):
             raise NotImplementedError # XXX create index-creation code
@@ -81,7 +81,7 @@ class FieldIndexForwardSort:
             print msg
 
         all_docids = list(self.index._rev_index.keys())
-        random.shuffle(all_docids)
+        random.shuffle(list(all_docids)
 
         main = []
 
@@ -194,7 +194,7 @@ class FieldIndexForwardSort:
             test = sortname1 == 'nbest' and sortname2 == 'timsort'
             test_fn = nbest_ascending_wins
 
-            for x in xrange(0, min(len(values1), len(values2))):
+            for x in range(0, min(len(values1), len(values2))):
                 t1 = values1[x]
                 t2 = values2[x]
                 limit = self.limits[x]
@@ -267,7 +267,7 @@ class FieldIndexForwardSort:
 
 def timer(fn, *args, **kw):
     times = []
-    for x in xrange(7):
+    for x in range(7):
         start = time.time()
         result = fn(*args, **kw)
         if not hasattr(result, '__len__'):
@@ -306,7 +306,7 @@ def median(numbers):
         return copy[n // 2]
     else:
         return (copy[n // 2 - 1] + copy[n // 2]) / 2
-  
+
 def series(numdocs, base):
     exp = int(math.ceil(math.log(numdocs) / math.log(base)))
     return [ pow(base, x) for x in range(1, exp) ]

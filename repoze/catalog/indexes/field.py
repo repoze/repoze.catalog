@@ -1,14 +1,15 @@
 import bisect
 import heapq
-from itertools import islice
+import itertools
 
-from zope.interface import implements
+from zope.interface import implementer
 
 from zope.index.field import FieldIndex
 
 from repoze.catalog.interfaces import ICatalogIndex
 from repoze.catalog.indexes.common import CatalogIndex
 from repoze.catalog import RangeValue
+from repoze.catalog.compat import text_type
 
 _marker = []
 
@@ -17,6 +18,7 @@ NBEST = 'nbest'
 TIMSORT = 'timsort'
 
 
+@implementer(ICatalogIndex)
 class CatalogFieldIndex(CatalogIndex, FieldIndex):
     """ Field indexing.
 
@@ -46,11 +48,10 @@ class CatalogFieldIndex(CatalogIndex, FieldIndex):
 
     - NotInRange
     """
-    implements(ICatalogIndex)
 
     def __init__(self, discriminator):
         if not callable(discriminator):
-            if not isinstance(discriminator, basestring):
+            if not isinstance(discriminator, text_type):
                 raise ValueError('discriminator value must be callable or a '
                                  'string')
         self.discriminator = discriminator
@@ -73,14 +74,14 @@ class CatalogFieldIndex(CatalogIndex, FieldIndex):
         rev_index = self._rev_index
         value = rev_index.get(docid, _marker)
         if value is _marker:
-            return # not in index
+            return  # not in index
 
         del rev_index[docid]
 
         try:
             set = self._fwd_index[value]
             set.remove(docid)
-        except KeyError:    #pragma NO COVERAGE
+        except KeyError:    # pragma NO COVERAGE
             # This is fishy, but we don't want to raise an error.
             # We should probably log something.
             # but keep it from throwing a dirty exception
@@ -92,7 +93,7 @@ class CatalogFieldIndex(CatalogIndex, FieldIndex):
         self._num_docs.change(-1)
 
     def _indexed(self):
-        return self._rev_index.keys()
+        return list(self._rev_index.keys())
 
     def sort(self, docids, reverse=False, limit=None, sort_type=None):
         if not docids:
@@ -150,7 +151,7 @@ class CatalogFieldIndex(CatalogIndex, FieldIndex):
             # XXX this needs work.
             rlen = len(docids)
             if limit:
-                if (limit < 300) or (limit/float(rlen) > 0.09):
+                if (limit < 300) or (limit / float(rlen) > 0.09):
                     sort_type = NBEST
                 else:
                     sort_type = TIMSORT
@@ -167,27 +168,28 @@ class CatalogFieldIndex(CatalogIndex, FieldIndex):
             raise ValueError('Unknown sort type %s' % sort_type)
 
     def scan_forward(self, docids, limit=None):
-        fwd_index = self._fwd_index
+        def in_docids(value):
+            return value in docids
 
-        n = 0
-        for set in fwd_index.values():
-            for docid in set:
-                if docid in docids:
-                    n+=1
-                    yield docid
-                    if limit and n >= limit:
-                        raise StopIteration
+        return itertools.islice(
+            filter(
+                in_docids, itertools.chain.from_iterable(
+                    self._fwd_index.values()
+                )
+            ),
+            limit,
+        )
 
     def nbest_ascending(self, docids, limit):
-        if limit is None: #pragma NO COVERAGE
-            raise RuntimeError, 'n-best used without limit'
+        if limit is None:  # pragma NO COVERAGE
+            raise RuntimeError('n-best used without limit')
 
         # lifted from heapq.nsmallest
 
         h = nsort(docids, self._rev_index)
         it = iter(h)
-        result = sorted(islice(it, 0, limit))
-        if not result: #pragma NO COVERAGE
+        result = sorted(itertools.islice(it, 0, limit))
+        if not result:  # pragma NO COVERAGE
             raise StopIteration
         insort = bisect.insort
         pop = result.pop
@@ -203,8 +205,8 @@ class CatalogFieldIndex(CatalogIndex, FieldIndex):
             yield docid
 
     def nbest_descending(self, docids, limit):
-        if limit is None: #pragma NO COVERAGE
-            raise RuntimeError, 'N-Best used without limit'
+        if limit is None:  # pragma NO COVERAGE
+            raise RuntimeError('N-Best used without limit')
         iterable = nsort(docids, self._rev_index)
         for value, docid in heapq.nlargest(limit, iterable):
             yield docid
@@ -218,19 +220,19 @@ class CatalogFieldIndex(CatalogIndex, FieldIndex):
     def _timsort(self, docids, limit=None, reverse=False):
         n = 0
         marker = _marker
-        _missing = []
 
-        def get(k, rev_index=self._rev_index, marker=marker):
-            v = rev_index.get(k, marker)
-            if v is marker:
-                _missing.append(k)
-            return v
+        def not_marker(docid):
+            return self._rev_index.get(docid, marker) is not marker
 
-        for docid in sorted(docids, key=get, reverse=reverse):
-            if docid in _missing:
-                # skip docids not in this index
-                continue
-            n += 1
+        for docid in itertools.islice(
+            sorted(
+                filter(not_marker, docids),
+                key=self._rev_index.get,
+                reverse=reverse,
+            ),
+            0,
+            limit,
+        ):
             yield docid
             if limit and n >= limit:
                 raise StopIteration
@@ -250,8 +252,7 @@ class CatalogFieldIndex(CatalogIndex, FieldIndex):
         if len(sets) == 1:
             result = sets[0]
         elif operator == 'and':
-            sets.sort()
-            for set in sets:
+            for set in sorted(sets, key=lambda x: len(x)):
                 result = self.family.IF.intersection(set, result)
         else:
             result = self.family.IF.multiunion(sets)
@@ -346,7 +347,7 @@ def fwscan_wins(limit, rlen, numdocs):
         # this.
         if 512/div <= docratio < 1024/div and limitratio <= 4/div:
             return True
-        elif  1024/div <= docratio < 2048/div and limitratio <= 32/div:
+        elif 1024/div <= docratio < 2048/div and limitratio <= 32/div:
             return True
         elif 2048/div <= docratio < 4096/div and limitratio <= 128/div:
             return True

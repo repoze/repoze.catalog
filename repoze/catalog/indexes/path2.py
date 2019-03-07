@@ -1,14 +1,17 @@
-from zope.interface import implements
+from zope.interface import implementer
 
 import BTrees
 
 from repoze.catalog.interfaces import ICatalogIndex
 from repoze.catalog.indexes.common import CatalogIndex
+from repoze.catalog.compat import text_type
+from six.moves import range
 
 _marker = object()
 
 
-class CatalogPathIndex2(CatalogIndex):  #pragma NO COVERAGE
+@implementer(ICatalogIndex)
+class CatalogPathIndex2(CatalogIndex):  # pragma NO COVERAGE
     """
     DEPRECATED
 
@@ -31,19 +34,18 @@ class CatalogPathIndex2(CatalogIndex):  #pragma NO COVERAGE
     Eq
 
     """
-    implements(ICatalogIndex)
-    attr_discriminator = None # b/w compat
+    attr_discriminator = None  # b/w compat
 
     family = BTrees.family32
 
     def __init__(self, discriminator, attr_discriminator=None):
         if not callable(discriminator):
-            if not isinstance(discriminator, basestring):
+            if not isinstance(discriminator, text_type):
                 raise ValueError('discriminator value must be callable or a '
                                  'string')
         self.discriminator = discriminator
         if attr_discriminator is not None and not callable(attr_discriminator):
-            if not isinstance(attr_discriminator, basestring):
+            if not isinstance(attr_discriminator, text_type):
                 raise ValueError('attr_discriminator value must be callable '
                                  'or a string')
         self.attr_discriminator = attr_discriminator
@@ -62,11 +64,14 @@ class CatalogPathIndex2(CatalogIndex):  #pragma NO COVERAGE
     def __nonzero__(self):
         return True
 
+    def __bool__(self):
+        return True
+
     def _getPathTuple(self, path):
         if not path:
             raise ValueError('path must be nonempty (not %s)' % str(path))
 
-        if isinstance(path, basestring):
+        if isinstance(path, text_type):
             path = path.rstrip('/')
             path = tuple(path.split('/'))
 
@@ -188,7 +193,7 @@ class CatalogPathIndex2(CatalogIndex):  #pragma NO COVERAGE
             return False
 
     def _indexed(self):
-        return self.docid_to_path.keys()
+        return list(self.docid_to_path.keys())
 
     def search(self, path, depth=None, include_path=False, attr_checker=None):
         """ Provided a path string (e.g. ``/path/to/object``) or a
@@ -240,7 +245,7 @@ class CatalogPathIndex2(CatalogIndex):  #pragma NO COVERAGE
             try:
                 docid = self.path_to_docid[path]
             except KeyError:
-                pass # XXX should we just return an empty set?
+                pass  # XXX should we just return an empty set?
             else:
                 sets.append(self.family.IF.Set([docid]))
 
@@ -300,7 +305,7 @@ class CatalogPathIndex2(CatalogIndex):  #pragma NO COVERAGE
             try:
                 docid = self.path_to_docid[nextpath]
             except KeyError:
-                continue # XXX we can't search from an unindexed root path?
+                continue  # XXX we can't search from an unindexed root path?
             attr = self.docid_to_attr.get(docid, _marker)
             if attr is _marker:
                 if include_path and nextpath == path:
@@ -334,7 +339,7 @@ class CatalogPathIndex2(CatalogIndex):  #pragma NO COVERAGE
                         continue
                     stack.append((newpath, attrs[:]))
 
-        return attr_checker(result.values())
+        return attr_checker(list(result.values()))
 
     def apply_intersect(self, query, docids):
         """ Default apply_intersect implementation """
@@ -355,7 +360,7 @@ class CatalogPathIndex2(CatalogIndex):  #pragma NO COVERAGE
         documentation for the ``search`` method of this class to
         understand paths, depths, and the ``include_path`` argument.
         """
-        if isinstance(query, (basestring, tuple, list)):
+        if isinstance(query, (text_type, tuple, list)):
             path = query
             depth = None
             include_path = False
@@ -371,16 +376,18 @@ class CatalogPathIndex2(CatalogIndex):  #pragma NO COVERAGE
     def applyEq(self, query):
         return self.apply(query)
 
+
 def add_to_closest(sofar, thispath, theset):
-    paths = sorted(sofar.keys(), reverse=True)
+    paths = sorted(list(sofar.keys()), reverse=True)
     for path in paths:
         pathlen = len(path)
         if thispath[:pathlen] == path:
             sofar[path][1].update(theset)
             break
 
+
 def remove_from_closest(sofar, thispath, docid):
-    paths = sorted(sofar.keys(), reverse=True)
+    paths = sorted(list(sofar.keys()), reverse=True)
     for path in paths:
         pathlen = len(path)
         if thispath[:pathlen] == path:
@@ -388,4 +395,3 @@ def remove_from_closest(sofar, thispath, docid):
             if docid in theset:
                 theset.remove(docid)
             break
-

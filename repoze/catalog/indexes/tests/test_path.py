@@ -1,4 +1,5 @@
 import unittest
+from six.moves import range
 
 _marker = object()
 
@@ -38,7 +39,7 @@ class PathIndexTests(unittest.TestCase):
         def _discriminator(obj, default):
             """ """
         index = self._makeOne(discriminator=_discriminator)
-        self.failUnless(index.discriminator is _discriminator)
+        self.assertTrue(index.discriminator is _discriminator)
 
     def test_ctor_string_discriminator(self):
         index = self._makeOne(discriminator='abc')
@@ -94,7 +95,7 @@ class PathIndexTests(unittest.TestCase):
         index.insertEntry('aaa', 1, 2)
         self.assertEqual(len(index._index), 1)
         self.assertEqual(len(index._index['aaa']), 1)
-        self.failUnless(index._index['aaa'][2] is fts)
+        self.assertTrue(index._index['aaa'][2] is fts)
         self.assertEqual(list(index._index['aaa'][2]), [1])
         self.assertEqual(index._depth, 2)
 
@@ -154,9 +155,9 @@ class PathIndexTests(unittest.TestCase):
         index.index_doc(1, dummy)
         del dummy.abc
         index.index_doc(1, dummy)
-        self.failIf('a' in index._index)
-        self.failIf('b' in index._index)
-        self.failIf('c' in index._index)
+        self.assertFalse('a' in index._index)
+        self.assertFalse('b' in index._index)
+        self.assertFalse('c' in index._index)
         self.assertEqual(index._depth, 2)
 
     def test_index_doc_persistent_value_raises(self):
@@ -197,28 +198,28 @@ class PathIndexTests(unittest.TestCase):
 
     def test_searches_against_root_plain_string(self):
         index = self._makeOne(VALUES)
-        expected = range(1,19)
+        expected = list(range(1,19))
 
         results = list(index.apply('/').keys())
         self.assertEqual(results, expected)
 
     def test_searches_against_root_tuple(self):
         index = self._makeOne(VALUES)
-        expected = range(1,19)
+        expected = list(range(1,19))
 
         results = list(index.apply(('',)).keys())
         self.assertEqual(results, expected)
 
     def test_searches_against_root_list(self):
         index = self._makeOne(VALUES)
-        expected = range(1,19)
+        expected = list(range(1,19))
 
         results = list(index.apply(['']).keys())
         self.assertEqual(results, expected)
 
     def test_searches_against_root_wo_level(self):
         index = self._makeOne(VALUES)
-        expected = range(1,19)
+        expected = list(range(1,19))
 
         results = list(index.apply({'query': '/'}).keys())
         self.assertEqual(results, expected)
@@ -227,7 +228,7 @@ class PathIndexTests(unittest.TestCase):
         index = self._makeOne(VALUES)
         comp = "/"
         level = 0
-        expected = range(1,19)
+        expected = list(range(1,19))
 
         results = list(index.apply({'query': '/', 'level': 0}).keys())
         self.assertEqual(results, expected)
@@ -489,53 +490,53 @@ class PathIndexTests(unittest.TestCase):
 
     def test_applyEq(self):
         index = self._makeOne(VALUES)
-        expected = range(1,19)
+        expected = list(range(1,19))
 
         results = list(index.applyEq('/').keys())
         self.assertEqual(results, expected)
 
     def test_applyNotEq(self):
         index = self._makeOne(VALUES)
-        expected = range(1,10)
+        expected = list(range(1,10))
 
         results = list(index.applyNotEq('/bb').keys())
         self.assertEqual(results, expected)
 
     def test_docids(self):
         index = self._makeOne(VALUES)
-        self.assertEquals(set(index.docids()), set(range(1, 19)))
+        self.assertEqual(set(index.docids()), set(range(1, 19)))
 
     def test_unindex_doc_removes_from_docids(self):
         index = self._makeOne(VALUES)
         index.index_doc(20, _marker)
         index.unindex_doc(20)
-        self.failIf(20 in index.docids())
+        self.assertFalse(20 in index.docids())
 
     def test_index_doc_then_missing_value(self):
         index = self._makeOne(VALUES)
         self.assertEqual(set([3]), set(index.applyEq('/aa/aa/cc/3.html')))
-        self.failUnless(3 in index.docids())
+        self.assertTrue(3 in index.docids())
         index.index_doc(3, _marker)
         self.assertEqual(set(), set(index.applyEq('/aa/aa/cc/3.html')))
-        self.failUnless(3 in index.docids())
+        self.assertTrue(3 in index.docids())
 
     def test_index_doc_missing_value_then_with_value(self):
         index = self._makeOne()
         index.index_doc(20, _marker)
         self.assertEqual(set(), set(index.applyEq('/cmr')))
-        self.failUnless(20 in index.docids())
+        self.assertTrue(20 in index.docids())
         index.index_doc(20, Dummy('/cmr/ljb'))
         self.assertEqual(set([20]), set(index.applyEq('/cmr')))
-        self.failUnless(20 in index.docids())
+        self.assertTrue(20 in index.docids())
 
     def test_index_doc_missing_value_then_unindex(self):
         index = self._makeOne()
         index.index_doc(20, _marker)
         self.assertEqual(set(), set(index.applyEq('/cmr')))
-        self.failUnless(20 in index.docids())
+        self.assertTrue(20 in index.docids())
         index.unindex_doc(20)
         self.assertEqual(set(), set(index.applyEq('/cmr')))
-        self.failIf(20 in index.docids())
+        self.assertFalse(20 in index.docids())
 
     def test_docids_with_indexed_and_not_indexed(self):
         index = self._makeOne()
